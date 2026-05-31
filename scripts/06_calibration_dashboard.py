@@ -71,12 +71,28 @@ def main() -> None:
     ref_keys = jax.random.split(jax.random.PRNGKey(0), M_ref)
     Y_ref = vmap_simulate(_sim, THETA_STAR, ref_keys)
 
-    theta0 = THETA_STAR + jnp.array([0.0, 0.05, 0.03, 0.05, -0.03])
+    # Init far from theta* IN THE STIFF DIRECTION. Naive large-distance
+    # perturbations often land along sloppy directions (esp. beta), where
+    # MMD^2 is already at the noise floor and there's nothing to descend.
+    # The stiff direction at theta* is dominated by the symmetric bias
+    # combination b_1 + b_2 (see scripts/13_jacobian_comparison.py),
+    # so perturbing both biases together pushes loss off the noise floor.
+    theta0 = THETA_STAR + jnp.array([0.0, 0.0, 0.1, 0.0, 0.1])
+    # Distance ||delta|| = 0.14; both biases shift +0.1, giving an initial
+    # MMD^2 around 1e-2 -- well above noise floor (~5e-4), but moderate
+    # enough that LM-Newton steps don't immediately overshoot into the
+    # unstable BH regime (g/R > 1.5).
     print("Calibrating...")
-    log = calibrate(_sim, theta0, Y_ref, M=64, n_iter=60, verbose=True)
+    # init_damping = 100: bound first-step magnitude (with gradient norm ~3.5
+    # at this theta_0 the default damping=1 overshoots into the unstable
+    # regime; LM will adapt downward as iterations proceed).
+    log = calibrate(_sim, theta0, Y_ref, M=64, n_iter=60, init_damping=100.0,
+                    verbose=True)
     arrs = log.as_arrays()
 
-    losses = arrs["losses"]
+    # Plot the validation loss (fixed held-out seed set) -- monotone tracking.
+    # `losses` (noisy training-time, fresh seeds each iter) also available.
+    losses = arrs["val_losses"]
     thetas = arrs["thetas"]
     eigvals = arrs["eigvals"]
     eigvecs = arrs["eigvecs"]
@@ -102,19 +118,24 @@ def main() -> None:
     # ===================================================== FIGURE A: diagnostic
     figA, ax = plt.subplots(2, 3, figsize=(18, 10))
 
-    # A1: loss
+    # A1: loss -- plot best-so-far (running minimum) as the primary signal
+    # (standard convention for stochastic optimisation; guaranteed monotone)
+    # and overlay the raw val curve faintly.
     a = ax[0, 0]
     its = np.arange(losses.size)
-    a.semilogy(its, np.clip(losses, 1e-12, None), "o-", color=QUAL[0],
-               markersize=4, lw=1.5, label="OPG-preconditioned")
+    best = np.minimum.accumulate(losses)
+    a.semilogy(its, np.clip(best, 1e-12, None), "-", color=QUAL[0], lw=2.2,
+               label="best-so-far val MMD²")
+    a.semilogy(its, np.clip(losses, 1e-12, None), color=QUAL[0], lw=0.7,
+               alpha=0.4, label="raw val MMD² (per iter)")
     a.axhspan(max(nf_mean - 2 * nf_std, 1e-12),
               max(nf_mean + 2 * nf_std, 1e-12),
               color="grey", alpha=0.25, label=r"MMD$^2$ noise floor")
     a.axhline(max(nf_mean, 1e-12), color="grey", lw=1, ls="--")
     a.set_xlabel("iteration")
     a.set_ylabel(r"MMD$^2$")
-    a.set_title("A1. Loss trajectory")
-    a.legend(fontsize=9)
+    a.set_title("A1. Loss trajectory (val, fixed seeds)")
+    a.legend(fontsize=8)
 
     # A2: parameter trajectories
     a = ax[0, 1]

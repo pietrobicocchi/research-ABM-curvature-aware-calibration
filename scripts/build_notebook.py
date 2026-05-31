@@ -418,7 +418,7 @@ The result is a `CalibStats` named tuple with fields `loss`, `mean_grad`, `per_s
 cells.append(code(r"""
 # Compute per-seed gradients at a perturbed theta (small offset from truth
 # so the loss is non-trivial and gradients carry signal).
-theta0 = THETA_STAR + jnp.array([0.0, 0.05, 0.03, 0.05, -0.03])
+theta0 = THETA_STAR + jnp.array([0.0, 0.0, 0.1, 0.0, 0.1])
 
 M = 200  # extra-large so the cloud is easy to see
 keys = jax.random.split(jax.random.PRNGKey(11), M)
@@ -662,7 +662,7 @@ cells.append(code(r"""
 M_calib = 64
 print("Running calibration ...")
 calib_log = calibrate(_sim, theta0, Y_ref, M=M_calib, n_iter=60,
-                      verbose=False)
+                      init_damping=100.0, verbose=False)
 arrs = calib_log.as_arrays()
 print(f"Done. Final loss = {arrs['losses'][-1]:.4e}")
 """))
@@ -670,20 +670,27 @@ print(f"Done. Final loss = {arrs['losses'][-1]:.4e}")
 cells.append(code(r"""
 fig, axes = plt.subplots(1, 3, figsize=(16, 4.5))
 
-# Loss trajectory. We clip at a meaningful floor (5e-4) because the unbiased
-# MMD^2 estimator can dip slightly negative near the optimum, and on a log
-# axis those negatives would blow up the dynamic range. The grey band marks
-# the MMD^2 noise floor estimated by self-MMD between two independent
-# ensembles at theta_star.
+# Loss trajectory.
+#
+# Important: we plot the *validation* MMD^2 -- evaluated on a FIXED held-out
+# seed set every iteration. The optimizer sees the noisy per-iter MMD^2
+# (`losses`, computed on fresh seeds), which we also overlay faintly to show
+# the contrast. The val-track is the clean signal; the train-track oscillates
+# at the noise floor because consecutive iterations sample different MMD^2
+# realisations.
 a = axes[0]
 floor = 5e-4
-a.semilogy(np.clip(arrs["losses"], floor, None), "o-", color=QUAL[0],
-           markersize=4, lw=1.5)
+best_val = np.minimum.accumulate(arrs["val_losses"])
+a.semilogy(np.clip(best_val, floor, None), color=QUAL[0], lw=2.0,
+           label="best-so-far val MMD²")
+a.semilogy(np.clip(arrs["val_losses"], floor, None),
+           color=QUAL[0], lw=0.7, alpha=0.4,
+           label="raw val MMD² (per iter)")
 a.axhline(floor, color="grey", lw=1, ls="--",
           label=r"noise floor ($\sim 5\times 10^{-4}$)")
 a.set_xlabel("iteration")
 a.set_ylabel(r"$\widehat{\mathrm{MMD}}^2$ (clipped)")
-a.set_title("A. Loss trajectory")
+a.set_title("A. Loss trajectory (best-so-far)")
 a.legend(fontsize=8)
 
 # Parameter iterates.
@@ -717,7 +724,7 @@ plt.show()
 cells.append(md(r"""
 The loss falls quickly into the noise floor of the unbiased MMD² estimator (it can briefly dip below zero — that is the U-statistic, not a bug). The eigenvalue trajectory in panel C confirms the sloppy spectrum is a stable feature of the landscape, not an artefact of one iterate. The five eigenvalues stay well-separated by several orders of magnitude over the whole calibration trajectory.
 
-A practical note: because we started inside the basin of $\theta^*$, the parameter iterates do not move much — they oscillate at the noise floor. To see the calibration *find* the truth from farther away, push the initialisation harder (`theta0 = THETA_STAR + 0.5`), but watch out for the explosion threshold ($g_h / R > 1.5$).
+A practical note: we picked $\theta_0$ by shifting both biases together along the **stiff** eigendirection $v_1 \propto (b_1+b_2)/\sqrt{2}$. A random perturbation of the same magnitude almost always lands along the *sloppy* directions, where MMD² is already at the noise floor and there is nothing for the optimizer to descend. This itself is a consequence of the OPG spectrum we computed in section 6.
 """))
 
 # ====================================================== PART VIII: FALSIFICATION

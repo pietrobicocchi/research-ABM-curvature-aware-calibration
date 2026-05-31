@@ -135,6 +135,7 @@ def run_one(opt_name: str, theta_0: jax.Array, Y_ref: jax.Array) -> dict:
     return {
         "thetas": thetas,
         "losses": losses,
+        "val_losses": arrs.get("val_losses", losses),
         "err": err,
     }
 
@@ -220,8 +221,11 @@ def main() -> None:
         iter_halves = {opt: [] for opt in ["opg", "adam", "sgd"]}
 
         for opt in ["opg", "adam", "sgd"]:
+            # Use val_losses if available (clean), else fall back to losses.
+            r0 = results[(diff_name, 0, opt)]
+            loss_key = "val_losses" if "val_losses" in r0 else "losses"
             losses_stack = np.stack([
-                np.clip(results[(diff_name, p, opt)]["losses"], 1e-6, None)
+                np.clip(results[(diff_name, p, opt)][loss_key], 1e-6, None)
                 for p in range(N_PAIRS)
             ])
             errs_stack = np.stack([

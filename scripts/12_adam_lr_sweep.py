@@ -60,12 +60,21 @@ def main() -> None:
     ref_keys = jax.random.split(jax.random.PRNGKey(0), M_ref)
     Y_ref = vmap_simulate(_sim, THETA_STAR, ref_keys)
 
-    # Use the same theta_0 as Phase 2 medium/pair0 for direct comparability.
-    # Reproduce its sampling exactly.
-    raw = np.load(out / "10_phase2_convergence.npz")
-    theta0_np = raw["medium_pair0_adam_thetas"][0]
-    theta_0 = jnp.asarray(theta0_np)
-    print(f"theta_0 = {theta0_np}")
+    # Pick a fixed, reproducible theta_0 at the medium-difficulty distance.
+    # We sample a random unit direction (PRNGKey deterministic) and scale to
+    # 0.15 in parameter space, with safety guard against the explosion
+    # threshold g_h / R > 1.36.
+    key = jax.random.PRNGKey(1234)
+    while True:
+        u = jax.random.normal(key, (5,))
+        u = u / jnp.linalg.norm(u)
+        candidate = THETA_STAR + 0.15 * u
+        g1, g2 = float(candidate[1]), float(candidate[3])
+        if g1 < 1.4 and g2 < 1.4 and g1 > 0 and g2 > 0:
+            theta_0 = candidate
+            break
+        key, _ = jax.random.split(key)
+    print(f"theta_0 = {np.asarray(theta_0)}")
     print(f"||theta_0 - theta*|| = {float(jnp.linalg.norm(theta_0 - THETA_STAR)):.4f}")
 
     # Sweep Adam over lrs.
@@ -76,21 +85,23 @@ def main() -> None:
         a = log.as_arrays()
         adam_results[lr] = {
             "thetas": a["thetas"],
-            "losses": a["losses"],
+            "losses": a["val_losses"],  # clean track for plots
             "err": np.linalg.norm(a["thetas"] - np.asarray(THETA_STAR), axis=1),
         }
         print(f"  lr={lr:.0e}: err_end={adam_results[lr]['err'][-1]:.3f}  "
-              f"loss_end={adam_results[lr]['losses'][-1]:+.2e}")
+              f"val_loss_end={adam_results[lr]['losses'][-1]:+.2e}")
 
     # OPG and SGD for reference.
     print("OPG ...")
     opg_log = calibrate(_sim, theta_0, Y_ref, M=M, n_iter=N_ITER, verbose=False)
     opg_a = opg_log.as_arrays()
+    opg_a["losses"] = opg_a["val_losses"]  # use clean track for plots below
     opg_err = np.linalg.norm(opg_a["thetas"] - np.asarray(THETA_STAR), axis=1)
 
     print("SGD ...")
     sgd_log = sgd(_sim, theta_0, Y_ref, M=M, n_iter=N_ITER, lr=1e-3)
     sgd_a = sgd_log.as_arrays()
+    sgd_a["losses"] = sgd_a["val_losses"]
     sgd_err = np.linalg.norm(sgd_a["thetas"] - np.asarray(THETA_STAR), axis=1)
 
     # =============================== FIGURE

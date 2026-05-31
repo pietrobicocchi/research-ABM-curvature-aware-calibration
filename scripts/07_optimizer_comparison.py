@@ -35,12 +35,17 @@ def main() -> None:
     ref_keys = jax.random.split(jax.random.PRNGKey(0), M_ref)
     Y_ref = vmap_simulate(_sim, THETA_STAR, ref_keys)
 
-    theta0 = THETA_STAR + jnp.array([0.0, 0.08, 0.05, 0.08, -0.05])
+    # Init in the STIFF direction (symmetric bias shift). Generic large
+    # perturbations often land along sloppy directions where MMD^2 is
+    # already at the noise floor; perturbing b_1 and b_2 in the same
+    # direction puts the loss meaningfully above the floor.
+    theta0 = THETA_STAR + jnp.array([0.0, 0.0, 0.1, 0.0, 0.1])
     n_iter = 50
     M = 64
 
     print("OPG-preconditioned...")
-    opg_log = calibrate(_sim, theta0, Y_ref, M=M, n_iter=n_iter, verbose=False)
+    opg_log = calibrate(_sim, theta0, Y_ref, M=M, n_iter=n_iter,
+                        init_damping=100.0, verbose=False)
     print("Adam...")
     adam_log = adam(_sim, theta0, Y_ref, M=M, n_iter=n_iter, lr=1e-2)
     print("SGD...")
@@ -65,14 +70,14 @@ def main() -> None:
 
     fig, axes = plt.subplots(2, 3, figsize=(16, 9))
 
-    # A: losses
+    # A: best-so-far val losses (standard optim convention, monotone)
     ax = axes[0, 0]
-    ax.semilogy(np.clip(o["losses"], 1e-12, None), color=QUAL[0], lw=1.8, label="OPG")
-    ax.semilogy(np.clip(a["losses"], 1e-12, None), color=QUAL[1], lw=1.8, label="Adam")
-    ax.semilogy(np.clip(s["losses"], 1e-12, None), color=QUAL[2], lw=1.8, label="SGD")
+    for name, arr, color in [("OPG", o, QUAL[0]), ("Adam", a, QUAL[1]), ("SGD", s, QUAL[2])]:
+        best = np.minimum.accumulate(arr["val_losses"])
+        ax.semilogy(np.clip(best, 1e-12, None), color=color, lw=2.2, label=name)
     ax.set_xlabel("iteration")
-    ax.set_ylabel(r"MMD$^2$ (clipped at 1e-12)")
-    ax.set_title("A. Loss vs iteration")
+    ax.set_ylabel(r"best-so-far val MMD$^2$ (clipped)")
+    ax.set_title("A. Loss vs iteration (best val so far)")
     ax.legend(fontsize=9)
 
     # B: parameter distance
