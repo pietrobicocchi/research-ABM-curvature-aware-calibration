@@ -57,8 +57,24 @@ def simulate(
     sigma: float = 0.05,
     H: int = 3,
     x_init: float = 0.0,
+    grad_horizon: int | None = None,
 ) -> jax.Array:
     """Simulate one BH trajectory of length T. Returns x_{1..T}.
+
+    Args:
+        theta, key, T, R, sigma, H, x_init: as before. (`H` is the number of
+            trader types; unrelated to `grad_horizon`.)
+        grad_horizon: if None or >= T, gradient flows through the entire
+            trajectory (default). Otherwise, gradient flows only through the
+            last `grad_horizon` steps; the first `T - grad_horizon` steps are
+            wrapped in `stop_gradient`. This is the standard
+            gradient-truncation trick from Quera-Bofarull et al. 2023
+            ("Some Challenges of Calibrating Differentiable ABMs"), used in
+            Phase 1's horizon-bias killswitch experiment to test whether the
+            OPG eigenstructure is robust to truncation bias.
+
+    Note: forward (primal) pass is identical regardless of `grad_horizon`;
+    only the backward (tangent) pass differs.
 
     x_init perturbs both lagged states (x_{-1}, x_{-2}); useful for inspecting
     the bifurcation in the noiseless limit (sigma = 0), where the fundamental
@@ -68,5 +84,18 @@ def simulate(
     eps = sigma * jax.random.normal(key, (T,), dtype=theta.dtype)
     x0 = jnp.asarray(x_init, dtype=theta.dtype)
     init = (x0, x0, jnp.zeros((H,), dtype=theta.dtype))
-    _, xs = jax.lax.scan(lambda s, e: _step(s, e, params, R), init, eps)
-    return xs
+
+    step_fn = lambda s, e: _step(s, e, params, R)
+
+    if grad_horizon is None or grad_horizon >= T:
+        _, xs = jax.lax.scan(step_fn, init, eps)
+        return xs
+
+    n_pre = T - grad_horizon
+    # Primal pass for the first n_pre steps; cut gradient at the boundary.
+    state_pre, xs_pre = jax.lax.scan(step_fn, init, eps[:n_pre])
+    state_pre = jax.tree.map(jax.lax.stop_gradient, state_pre)
+    xs_pre = jax.lax.stop_gradient(xs_pre)
+    # Last `grad_horizon` steps with gradient flowing.
+    _, xs_post = jax.lax.scan(step_fn, state_pre, eps[n_pre:])
+    return jnp.concatenate([xs_pre, xs_post])

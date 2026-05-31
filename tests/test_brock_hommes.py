@@ -52,3 +52,63 @@ def test_fundamentalist_only_stays_near_zero():
     theta = jnp.array([0.0, 0.0, 0.0, 0.0, 0.0])  # all-zero -> trivial
     xs = simulate(theta, jax.random.PRNGKey(0), T=100, sigma=0.01)
     assert float(jnp.max(jnp.abs(xs))) < 1.0
+
+
+def test_grad_horizon_does_not_change_primal_pass():
+    """Forward (primal) pass must be identical regardless of grad_horizon."""
+    k = jax.random.PRNGKey(0)
+    full = simulate(THETA, k, T=100, sigma=0.05, R=1.1, grad_horizon=None)
+    trunc = simulate(THETA, k, T=100, sigma=0.05, R=1.1, grad_horizon=10)
+    assert jnp.allclose(full, trunc, atol=1e-5)
+
+
+def test_grad_horizon_full_matches_default():
+    """grad_horizon >= T should be identical to default."""
+    k = jax.random.PRNGKey(0)
+    full = simulate(THETA, k, T=50, sigma=0.05, R=1.1)
+    same = simulate(THETA, k, T=50, sigma=0.05, R=1.1, grad_horizon=50)
+    larger = simulate(THETA, k, T=50, sigma=0.05, R=1.1, grad_horizon=200)
+    assert jnp.allclose(full, same)
+    assert jnp.allclose(full, larger)
+
+
+def test_grad_horizon_changes_gradient():
+    """Truncated gradient should differ from full gradient."""
+    k = jax.random.PRNGKey(0)
+
+    def loss_full(t):
+        return jnp.mean(simulate(t, k, T=100, sigma=0.05, R=1.1) ** 2)
+
+    def loss_trunc(t):
+        return jnp.mean(
+            simulate(t, k, T=100, sigma=0.05, R=1.1, grad_horizon=10) ** 2
+        )
+
+    g_full = jax.grad(loss_full)(THETA)
+    g_trunc = jax.grad(loss_trunc)(THETA)
+    # Both must be finite, but they should differ.
+    assert bool(jnp.all(jnp.isfinite(g_full)))
+    assert bool(jnp.all(jnp.isfinite(g_trunc)))
+    rel_diff = float(jnp.linalg.norm(g_full - g_trunc) /
+                     jnp.linalg.norm(g_full + 1e-12))
+    assert rel_diff > 0.01, f"Truncation made no difference: rel_diff={rel_diff}"
+
+
+def test_grad_horizon_one_means_only_last_step():
+    """With grad_horizon=1, only the very last step's contribution flows back."""
+    k = jax.random.PRNGKey(0)
+
+    def loss(t):
+        return jnp.mean(
+            simulate(t, k, T=50, sigma=0.05, R=1.1, grad_horizon=1) ** 2
+        )
+
+    g = jax.grad(loss)(THETA)
+    assert bool(jnp.all(jnp.isfinite(g)))
+    # With only 1 step of gradient, ||g|| should be much smaller than the full
+    # gradient.
+    def loss_full(t):
+        return jnp.mean(simulate(t, k, T=50, sigma=0.05, R=1.1) ** 2)
+
+    g_full = jax.grad(loss_full)(THETA)
+    assert float(jnp.linalg.norm(g)) < float(jnp.linalg.norm(g_full))
