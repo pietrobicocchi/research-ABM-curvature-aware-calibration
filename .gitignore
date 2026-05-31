@@ -1,0 +1,38 @@
+# Memory (Claude session notes, per-machine, not for repo)
+docs/memory/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Virtual env / uv
+.venv/
+venv/
+.python-version
+
+# Build/dist
+build/
+dist/
+*.egg
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Experiment outputs
+runs/
+outputs/
+wandb/
+mlruns/
+*.npz
+*.npy
+checkpoints/
