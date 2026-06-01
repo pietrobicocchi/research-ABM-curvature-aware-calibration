@@ -1,3 +1,16 @@
 \section{Introduction}
 \label{sec:intro}
-Introduction pending.
+
+Agent-based models are the standard policy instrument for systemic risk, epidemic response, and other domains in which heterogeneous interactions matter and a closed-form likelihood is unavailable. Differentiable agent-based modelling has turned this calibration bottleneck into a tractable gradient-based problem \citep{querabofarull_diffabm_2023,querabofarull_diffabm_2025}: the simulator is written as a chain of automatic-differentiation primitives, parameter gradients of any discrepancy loss are obtained by a single backward pass, and the calibrator computes per-seed gradients on the way to its scalar update.
+
+Yet first-order optimisers silently fail on these problems. With its default hyperparameters Adam diverges from $\theta^*$ on Brock--Hommes calibration --- not catastrophically, but along a specific direction in parameter space the loss does not constrain, while reaching the same MMD noise floor as a converged run. Existing diagnostics are an offline finite-difference Hessian \citep{naumann_woleske_2024} or per-parameter Jacobian sensitivities \citep{querabofarull_diffabm_2025}: the first is too expensive to run during calibration, the second cannot identify parameter \emph{combinations}. The real culprit is non-identifiability of combinations under the MMD loss, and we make this falsifiable.
+
+\citet{kunstner_opg_2019} showed that the outer-product-of-gradients matrix differs from the Fisher in likelihood maximisation and can mislead curvature-adaptive optimisers; we read the same matrix as the residual generalised Gauss--Newton approximation of the MMD-loss Hessian, where the residual structure of the U-statistic estimator licenses the GGN interpretation independently of any likelihood claim. The failure mode they identified does appear in non-likelihood agent-based calibration --- and it is operationally verifiable from the per-seed gradients the calibrator already computed.
+
+\paragraph{Contributions.}
+\begin{itemize}
+\item A live identifiability diagnostic for MMD-calibrated differentiable agent-based models, obtained as a free byproduct of the per-seed gradients the calibrator already needs (\S\ref{sec:method}, Figure~\ref{fig:method}).
+\item A non-circular validation protocol using three discrepancies the calibrator never saw; stiff/sloppy ratios of $10^2$--$10^6$ across three models including a discrete-state network with Gumbel-Sigmoid surrogate gradients (\S\ref{sec:results:falsification}, Figure~\ref{fig:falsification}).
+\item Empirical evidence that the diagnostic predicts where Adam fails: cross-optimiser ratio Adam~$v_P$~/~OPG~$v_1 = \mathbf{9.4 \times 10^4}$ (\S\ref{sec:results:predicts-adam}, Figure~\ref{fig:predicts-adam}).
+\item Demonstration that the diagnostic transfers to a discrete-state network agent-based model under Gumbel-Sigmoid surrogate gradients (\S\ref{sec:results:network-sir}, Figure~\ref{fig:network-sir}).
+\end{itemize}
