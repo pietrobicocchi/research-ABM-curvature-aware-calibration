@@ -253,7 +253,7 @@ runs = [
 # right quantity for visualising optimizer progress.
 for label, a, color in runs:
     best = np.minimum.accumulate(a["val_losses"])
-    axes[0].semilogy(np.clip(best, 1e-6, None), color=color, lw=2.2, label=label)
+    axes[0].semilogy(np.clip(best, 5e-4, None), color=color, lw=2.2, label=label)
 axes[0].set_xlabel("iteration")
 axes[0].set_ylabel(r"best-so-far val $\widehat{\mathrm{MMD}}^2$")
 axes[0].set_title(rf"(a) best-so-far loss (clean, fixed-seeds), $d_0={d0:.2f}$")
@@ -297,6 +297,16 @@ component along eigendirection $v_k$ should be **small when $\lambda_k$
 is large** (the data sees this direction, optimizer can navigate it) and
 **large when $\lambda_k$ is small** (the data does not see this direction,
 optimizer wanders).
+
+> **On circularity.** Decomposing the recovery error in $\hat F$'s own
+> eigenbasis is internally consistent but not externally validated — a
+> reviewer rightly worries that we are evaluating $\hat F$'s claim using
+> $\hat F$'s coordinates. The non-circular check is **Section 6 below**
+> (the §5.4 falsification protocol): perturb $\theta_T$ along the
+> stiffest and sloppiest eigenvectors and measure simulator-output
+> differences under **three discrepancies that have nothing to do with
+> MMD**. The 332×–8551× stiff/sloppy ratios there are the external
+> validation that $\hat F$'s eigenbasis is not loss-specific.
 """))
 
 cells.append(code(r"""
@@ -714,9 +724,9 @@ fig, axes = plt.subplots(1, 3, figsize=(17, 4.6))
 
 # (a) best-so-far loss over time
 opg_best = np.minimum.accumulate(opg_a["val_losses"])
-axes[0].semilogy(np.clip(opg_best, 1e-6, None), color=PAPER_COLORS["opg"], lw=2.2,
+axes[0].semilogy(np.clip(opg_best, 5e-4, None), color=PAPER_COLORS["opg"], lw=2.2,
                  label="OPG best-so-far val")
-axes[0].semilogy(np.clip(opg_a["val_losses"], 1e-6, None),
+axes[0].semilogy(np.clip(opg_a["val_losses"], 5e-4, None),
                  color=PAPER_COLORS["opg"], lw=0.7, alpha=0.4,
                  label="OPG raw val (per iter)")
 axes[0].axhline(5e-4, color="grey", lw=1, ls="--",
@@ -761,7 +771,7 @@ fig, axes = plt.subplots(1, 3, figsize=(17, 5))
 # (a) best-so-far validation loss for the cross-optimizer comparison
 for label, a, color in runs:
     best = np.minimum.accumulate(a["val_losses"])
-    axes[0].semilogy(np.clip(best, 1e-6, None), color=color, lw=2.2, label=label)
+    axes[0].semilogy(np.clip(best, 5e-4, None), color=color, lw=2.2, label=label)
 axes[0].axhline(5e-4, color="grey", lw=1, ls="--",
                 label="MMD$^2$ noise floor")
 axes[0].set_xlabel("iteration")

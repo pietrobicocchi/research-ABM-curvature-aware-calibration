@@ -74,9 +74,9 @@ def main() -> None:
     ax = axes[0, 0]
     for name, arr, color in [("OPG", o, QUAL[0]), ("Adam", a, QUAL[1]), ("SGD", s, QUAL[2])]:
         best = np.minimum.accumulate(arr["val_losses"])
-        ax.semilogy(np.clip(best, 1e-12, None), color=color, lw=2.2, label=name)
+        ax.semilogy(np.clip(best, 5e-4, None), color=color, lw=2.2, label=name)
     ax.set_xlabel("iteration")
-    ax.set_ylabel(r"best-so-far val MMD$^2$ (clipped)")
+    ax.set_ylabel(r"best-so-far val MMD$^2$ (clipped at noise floor $5\!\times\!10^{-4}$)")
     ax.set_title("A. Loss vs iteration (best val so far)")
     ax.legend(fontsize=9)
 
