@@ -1,3 +1,57 @@
 \section{Results}
 \label{sec:results}
-Results pending.
+
+Source code, seeds, and the figure-rendering scripts for every experiment are released at \texttt{<repo-url-here>} (anonymised at submission if double-blind). The five hero figures and one supplementary figure that follow exhaust the headline experimental claims; the appendix contains stability, robustness, and ablation evidence.
+
+\subsection{The Brock--Hommes calibration loss has a sloppy spectrum}
+\label{sec:results:bh-spectrum}
+
+The MMD-calibration loss of the canonical Brock--Hommes asset-pricing model \citep{brock_hommes_1997,brock_hommes_1998} has an OPG spectrum spanning \textbf{8.4 orders of magnitude} with condition number $\lambda_1 / \lambda_P = 2.4 \times 10^8$ at a near-truth evaluation point (Figure~\ref{fig:bh-spectrum}). The sloppiest direction $v_P$ is the parameter $\beta$ alone --- the intensity of choice in the switching dynamics --- which the MMD loss does not constrain. The stiffest direction $v_1$ is the symmetric-bias combination $(b_1 + b_2)/\sqrt{2}$, a combination no per-parameter sensitivity analysis can surface but that the eigendecomposition reads off automatically. The data does not constrain individual parameters; it constrains combinations.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig1_spectrum.png}
+  \caption{OPG geometry of the Brock--Hommes calibration loss. (a)~Per-seed gradient cloud in the top-2 OPG axes with the $1\sigma$ ellipse overlaid; the elongation \emph{is} the sloppiness. (b)~Eigenvalue spectrum with 95\% bootstrap confidence intervals; \textbf{8.4 OOM} span, condition $2.4 \times 10^8$. (c)~Parameter content $|V|$ of each eigendirection: $v_P$ is $\beta$ alone, $v_1$ is the symmetric-bias combination $(b_1 + b_2)/\sqrt{2}$.}
+  \label{fig:bh-spectrum}
+\end{figure}
+
+\subsection{The diagnostic is live from the first iterate}
+\label{sec:results:live}
+
+The eigenstructure of $\widehat F$ is stable along the calibration trajectory --- not just at convergence. Bootstrapping the top and bottom eigenvectors at intermediate iterates of a far-from-equilibrium calibration ($\|\theta_0 - \theta^*\| = 0.14$, $M=64$), the stiff direction $v_1(\theta_t)$ stays within \textbf{$9.7^\circ$} of $v_1(\theta^*)$ at $t=0$ and within $1.9^\circ$ at convergence; the sloppy direction $v_P(\theta_t)$ is within $20.3^\circ$ at $t=0$ and within $1.1^\circ$ at convergence (Figure~\ref{fig:supp-trajectory} in the appendix). The diagnostic is therefore usable from the very first OPG matrix the calibrator computes: one can identify the directions along which a first-order optimiser will wander before spending any compute on the optimisation itself.
+
+\subsection{Non-circular validation across three models}
+\label{sec:results:falsification}
+
+If the OPG eigenvectors identified an MMD-kernel artefact rather than identifiability of the model, the discrepancies of Equation~\eqref{eq:disc} along $v_1$ and $v_P$ would be comparable. They are not. On three structurally different agent-based models --- Brock--Hommes financial \citep{brock_hommes_1997}, mean-field SIR \citep{kermack_mckendrick_1927}, and a discrete-state network SIR with Gumbel-Sigmoid surrogate gradients \citep{maddison_concrete_2017,jang_gumbel_2017} --- and across three discrepancies unrelated to the calibration kernel (four moments, autocorrelation up to lag~20, four tail quantiles), the stiff/sloppy ratio exceeds \textbf{$10^2$} on every channel and every model (Figure~\ref{fig:falsification}). The headline ratios are Brock--Hommes $489\times / 581\times / 19{,}500\times$, mean-field SIR $354{,}000\times / 930{,}000\times / 395{,}000\times$, and network-SIR $171{,}000\times / 238{,}000\times / 36{,}300\times$, for moments / ACF / tail quantiles respectively. The MMD kernel mean embedding does not appear in the test; the result is therefore not a self-fulfilling consequence of the calibration loss.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig2_falsification.png}
+  \caption{Non-circular validation of the OPG diagnostic. Three models (rows) $\times$ three discrepancies unrelated to the calibration kernel (columns: first four moments; autocorrelation up to lag~20; four tail quantiles) under the same $\alpha = 10^{-2}$ perturbation along the stiff $v_1$ and sloppy $v_P$ directions. Stiff/sloppy ratios are annotated per panel; aggregate ratios per model in the rightmost column. All twelve panels exceed $10^2$.}
+  \label{fig:falsification}
+\end{figure}
+
+\subsection{The diagnostic predicts where Adam fails}
+\label{sec:results:predicts-adam}
+
+When the recovery error $\theta_T - \theta^*$ of an MMD-calibrated optimiser is decomposed along the OPG eigenbasis at $\theta^*$, the median squared component tracks the inverse eigenvalue scaling: small $\lambda_k$ directions are the directions every optimiser fails along (Figure~\ref{fig:predicts-adam}). Adam fails along the sloppy direction more than OPG-preconditioned Levenberg-Marquardt does: at medium difficulty ($\|\theta_0 - \theta^*\| = 0.15$, $5$ random unit-vector inits), the cross-optimiser ratio Adam~$v_P$ / OPG~$v_P$ is \textbf{$34\times$} and Adam~$v_P$ / OPG~$v_1$ is \textbf{$9.4 \times 10^4$}. Across 15 Brock--Hommes seeds and 10 SIR seeds, Adam diverges from $\theta^*$ in $25 / 25$ runs (95\% LCB $\approx 88\%$). The diagnostic predicts the failure mode without the failure mode needing to be observed first.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig3_predicts_adam.png}
+  \caption{Recovery error decomposed along the OPG eigenbasis at $\theta^*$. (a)~Median (IQR) squared component per eigendirection over $5$ random unit-vector inits at distance $0.15$ from $\theta^*$; Adam's $v_5$ bar towers above OPG's and SGD's. (b)~Median squared error against eigenvalue; small-$\lambda$ directions are the failure directions for every optimiser, with Adam's failure systematically larger. Cross-optimiser ratios: Adam~$v_P$/OPG~$v_P = 34\times$; Adam~$v_P$/OPG~$v_1 = 9.4 \times 10^4$.}
+  \label{fig:predicts-adam}
+\end{figure}
+
+\subsection{The diagnostic survives discrete states under Gumbel-Sigmoid surrogates}
+\label{sec:results:network-sir}
+
+The standard concern with differentiable agent-based modelling is that gradients computed through a discrete-state simulator with Gumbel-Sigmoid surrogate transitions \citep{maddison_concrete_2017,jang_gumbel_2017} are biased by construction, and could in principle mislead any identifiability diagnostic that consumes them. We test this directly on a network-SIR model with per-node Gumbel-Sigmoid infection and recovery transitions ($N=250$, mean degree $6$, $\tau_{\mathrm{Gumbel}}=0.5$). The OPG eigenvectors recover qualitatively the same stiff/sloppy structure as the smooth mean-field SIR: the stiff direction is dominated by the initial-infection fraction with a contact-rate correction, $v_1 \approx 0.89\, I_0 + 0.46\, \beta$, and the sloppy direction is essentially the lockdown intensity, $v_P \approx 0.995\, f_{\mathrm{lock}}$ --- the early-weak-vs-late-strong policy degeneracy a public-health analyst would derive from the model equations (Figure~\ref{fig:network-sir}). The spectrum widens to \textbf{20.7 OOM} and the non-MMD falsification ratios reach $10^4$--$10^5\times$ even under the surrogate bias, so the biased gradients identify real identifiability structure rather than surrogate artefacts.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig4_network_sir.png}
+  \caption{Network-SIR diagnostic with Gumbel-Sigmoid surrogate gradients. (a)~Daily new infections at $\theta^*$ (with lockdown) versus a no-lockdown counterfactual. (b)~OPG spectrum with 95\% bootstrap confidence intervals; \textbf{20.7 OOM} span. (c)~Eigenvector content; $v_1 \approx 0.89\, I_0 + 0.46\, \beta$, $v_P \approx 0.995\, f_{\mathrm{lock}}$. (d)~Mean-field versus network-SIR spectra: the qualitative structure transfers under surrogate-gradient bias.}
+  \label{fig:network-sir}
+\end{figure}
