@@ -289,13 +289,66 @@ to **simulator-level non-identifiability**, not loss-specific artefacts.
 The mechanism is model-agnostic: it worked on Brock–Hommes, it works on SIR.
 """),
     md(r"""
-## 4. Summary
+## 4. Calibration race on SIR
 
-Three claims established on Brock–Hommes and reproduced on SIR:
+The diagnostic just predicted that on SIR the **stiff direction is $I_0$** and
+the **sloppy direction is $f_{\mathrm{lock}}$**. Therefore, calibrating from a
+small perturbation along $v_1$, we expect:
 
-1. **Sloppy spectrum**: 13 OOM dynamic range here vs 7 OOM on BH.
-2. **Domain-meaningful eigenvectors**: SIR finds $I_0$ as the stiffest direction (early-growth slope), $\beta$/$\gamma$ as the next (outbreak rate $R_0$), and $f_{\mathrm{lock}}$/$t_{\mathrm{lock}}$ confounded as the sloppiest (late-strong vs early-weak policy indistinguishability).
-3. **§5.4 falsification ratios** 6000–55000× — within an order of magnitude of BH (332–8551×), confirming the diagnostic is not loss-specific.
+- **OPG (LM)**: navigates the stiff direction correctly, stays near $\theta_0$.
+- **Adam**: its per-coordinate noise adaptation will amplify gradient components
+  in the sloppy direction, sending it wandering along $f_{\mathrm{lock}}$.
+- **SGD**: fixed step size, no momentum, no adaptation — should be safe if the
+  step is small enough.
+
+The result, from `scripts/17_sir_calibration_race.py`:
+
+**Single init** ($\theta_0 = \theta^* + 0.0015\,v_1$):
+
+| | OPG | Adam | SGD |
+|---|---|---|---|
+| Final $\|\theta_T - \theta^*\|$ | 0.0015 (stays) | **0.130** (87× worse) | 0.0016 (stays) |
+
+**Multi-seed** (N=10 random unit-vector inits in eigenbasis, scaled to 0.0015):
+
+| Optimizer | median | IQR | max |
+|---|---|---|---|
+| OPG (LM) | 1.5e-3 | [1.5, 1.5]e-3 | **1.5e-3** — rock solid |
+| Adam | 1.3e-1 | [1.3, 1.3]e-1 | 2.5e-1 — uniform divergence |
+| SGD | 1.5e-3 | [1.5, 1.8]e-3 | **28.7** — 2/10 catastrophic failures |
+
+Pairwise wins: **OPG < Adam: 10/10**; SGD < Adam: 8/10; OPG < SGD: 6/10 (with the
+two SGD catastrophes counted as SGD losses).
+
+**New finding on SIR (not seen on Brock-Hommes).** SGD has **heavy-tailed
+failures**: 2 of 10 seeds gave catastrophic errors (0.13 and 28.7) because
+SGD's fixed step overshoots in directions where the loss is steep
+($\lambda_1 = 1.22\times 10^7$). OPG's damped Cholesky-Newton step naturally
+bounds step magnitude per direction; SGD does not.
+
+The OPG-vs-SGD relationship on BH was "tied at best SGD lr." On SIR it is
+clearly **OPG > SGD on robustness**, because the high-curvature SIR
+directions break SGD on a meaningful fraction of inits.
+"""),
+    code(r"""
+from pathlib import Path
+from IPython.display import Image, display
+
+png = Path("outputs/sir/17_sir_calibration_race.png")
+if png.exists():
+    display(Image(str(png)))
+else:
+    print(f"Run scripts/17_sir_calibration_race.py to generate {png}.")
+"""),
+    md(r"""
+## 5. Summary
+
+Established on Brock–Hommes and reproduced on SIR:
+
+1. **Sloppy spectrum**: 13 OOM here vs 7 OOM on BH.
+2. **Domain-meaningful eigenvectors**: SIR finds $I_0$ as stiffest (early-growth slope), $\beta$/$\gamma$ as next (outbreak rate $R_0$), and $f_{\mathrm{lock}}$/$t_{\mathrm{lock}}$ confounded as sloppiest (late-strong vs early-weak policy indistinguishability).
+3. **§5.4 falsification ratios** 6 000–55 000× — within an order of magnitude of BH (332–8 551×).
+4. **Optimiser race**: OPG beats Adam 10/10 seeds (diagnostic predicted Adam's failure direction). SGD has 2/10 catastrophic failures unique to SIR's high-curvature directions.
 
 The remaining "generalisation" target is **Tier B** — network-SIR with discrete state transitions and Gumbel-Softmax surrogate gradients — which would address the surrogate-bias regime explicitly. Tier A above already establishes model-agnosticity.
 
