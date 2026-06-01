@@ -1,3 +1,44 @@
 \section{Method}
 \label{sec:method}
-Method pending.
+
+The diagnostic is a single matrix --- the outer product of per-seed gradients --- and the eigendecomposition that reads its identifiability content. This section defines the simulator, the loss, the per-seed gradient used by both calibration and the diagnostic, and the non-circular validation protocol.
+
+\subsection{Setup}
+\label{sec:method:setup}
+
+A differentiable agent-based model is a function $f_\theta : \Xi \to \mathbb{R}^T$ mapping parameters $\theta \in \mathbb{R}^P$ and a per-seed random key $\xi \in \Xi$ to an observable trajectory $x = f_\theta(\xi)$. We calibrate against a reference trajectory tensor $Y_{\mathrm{ref}} \in \mathbb{R}^{M \times T}$ held fixed throughout, using the unbiased squared maximum-mean-discrepancy with median-heuristic bandwidth \citep{gretton_mmd_2012}: $L(\theta) = \widehat{\mathrm{MMD}}^2\!\bigl(X_\theta, Y_{\mathrm{ref}}\bigr)$, where $X_\theta = (f_\theta(\xi_m))_{m=1}^{M}$ are $M$ simulator replicas under independent keys. The per-seed gradient is the chain-rule contribution from one simulator seed,
+\begin{equation}
+\label{eq:gm}
+g_m \;=\; M \cdot \frac{\partial L}{\partial x_m}\,\frac{\partial x_m}{\partial \theta}
+\;\in\; \mathbb{R}^{P},
+\qquad
+\bar g \;=\; \frac{1}{M}\sum_m g_m \;=\; \nabla_\theta L,
+\end{equation}
+obtained by a single vector--Jacobian product through the simulator. Figure~\ref{fig:method} summarises the pipeline.
+
+\begin{figure}[t]
+  \centering
+  \input{diagrams/fig0_method.tex}
+  \caption{The OPG diagnostic pipeline. Per-seed gradients computed by vector--Jacobian product through the simulator are the natural inputs for the outer-product matrix $\widehat F$; its eigendecomposition names the parameter combinations the data constrains. The eigendecomposition step is a free byproduct of the gradients the calibrator already needs.}
+  \label{fig:method}
+\end{figure}
+
+\subsection{The OPG matrix and a Gauss--Newton reading}
+\label{sec:method:opg}
+
+We define the \emph{outer-product-of-gradients} (OPG) matrix as the second moment of the per-seed gradients,
+\begin{equation}
+\label{eq:opg}
+\widehat{F}(\theta) \;=\; \frac{1}{M} \sum_{m=1}^{M} g_m\, g_m^{\top}.
+\end{equation}
+For an MMD U-statistic loss, the residual structure of the unbiased estimator \citep{gretton_mmd_2012} licenses interpreting $\widehat F$ as a stochastic generalised Gauss--Newton (GGN) approximation of the loss Hessian near a minimum, independently of any likelihood interpretation. \citet{kunstner_opg_2019} showed that the outer-product-of-gradients matrix differs from the Fisher in likelihood maximisation and can mislead curvature-adaptive optimisers; the same matrix, correctly read as the residual-GGN approximation of the MMD-loss Hessian, is the right diagnostic for non-likelihood ABM calibration --- and the failure mode they identified appears here too (\S\ref{sec:results:predicts-adam}), operationally verifiable from the per-seed gradients the calibrator already computed. Throughout we call $\widehat F$ the OPG matrix, never the empirical Fisher.
+
+\subsection{Non-circular validation via non-MMD discrepancies}
+\label{sec:method:falsification}
+
+The eigendecomposition $\widehat F\, v_k = \lambda_k\, v_k$ orders the parameter combinations by how strongly the MMD loss constrains them; the stiffest direction $v_1$ is the combination the data sees clearest, the sloppiest direction $v_P$ is the one it cannot constrain. To rule out the obvious null --- that $\widehat F$ identifies an MMD-kernel artefact rather than identifiability of the model --- we perturb $\theta^* \pm \alpha\, v_k$ for fixed $\alpha = 10^{-2}$ and measure the aggregate discrepancy
+\begin{equation}
+\label{eq:disc}
+\Delta_{\phi}\!\bigl(v_k\bigr) \;=\; \sum_i \bigl| \phi_i\bigl(X_{\theta^* + \alpha v_k}\bigr) - \phi_i\bigl(X_{\theta^*}\bigr) \bigr|
+\end{equation}
+for three statistics $\phi$ the calibrator never saw: the first four moments, the autocorrelation up to lag~20, and the four tail quantiles $\{1\%, 5\%, 95\%, 99\%\}$. If $\widehat F$ identifies real identifiability, the stiff/sloppy ratio $\Delta_\phi(v_1) / \Delta_\phi(v_P)$ should be large on every channel, on every model, with no MMD or kernel embedding appearing in the test. Section~\ref{sec:results:falsification} reports the result on three models.
