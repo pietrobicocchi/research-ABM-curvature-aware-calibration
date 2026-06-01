@@ -372,16 +372,30 @@ for label, color in opt_order:
 for k in range(5):
     axes[1].annotate(rf"$v_{k+1}$", (eigvals[k], 1.5e-9),
                      fontsize=9, ha="center", color="grey")
-# Ideal scaling: err ~ 1/lambda dashed reference line
-lam_line = np.logspace(np.log10(eigvals.min())+0.5,
-                       np.log10(eigvals.max())-0.5, 20)
-axes[1].plot(lam_line, 1e-5 / lam_line, ls="--", color="grey", lw=1,
-             label=r"$1/\lambda_k$ guide")
+# Least-squares fit on the pooled non-Adam data (OPG and SGD recover both
+# directions; Adam wanders so its slope would dominate spuriously). Report
+# the slope so the reader can judge whether the relationship is close to
+# 1/lambda (slope = -1 on a log-log plot).
+fit_y = []
+fit_x = []
+for label, _color in [("OPG (LM)", PAPER_COLORS["opg"]),
+                       ("SGD",      PAPER_COLORS["sgd"])]:
+    sq = components[label] ** 2
+    fit_x.append(np.log10(eigvals))
+    fit_y.append(np.log10(np.clip(sq, 1e-12, None)))
+fit_x = np.concatenate(fit_x)
+fit_y = np.concatenate(fit_y)
+slope, intercept = np.polyfit(fit_x, fit_y, 1)
+lam_line = np.logspace(np.log10(eigvals.min()) - 0.3,
+                       np.log10(eigvals.max()) + 0.3, 30)
+axes[1].plot(lam_line, 10 ** (intercept + slope * np.log10(lam_line)),
+             ls="--", color="grey", lw=1.2,
+             label=f"least-squares fit: slope = {slope:.2f}")
 axes[1].set_xscale("log")
 axes[1].set_yscale("log")
 axes[1].set_xlabel(r"$\lambda_k$ (eigenvalue of $\hat F(\theta^*)$)")
 axes[1].set_ylabel(r"$(v_k^\top (\theta_T - \theta^*))^2$")
-axes[1].set_title("(b) error scales inversely with the eigenvalue")
+axes[1].set_title(f"(b) error vs eigenvalue, fitted slope $= {slope:.2f}$")
 axes[1].legend(fontsize=10)
 
 # (c) iteration trajectory in stiff vs sloppy components
@@ -423,9 +437,15 @@ Panel (a): the squared error per eigendirection rises by 4-5 orders of
 magnitude going from stiff to sloppy. The data simply cannot see the
 sloppy components, so no optimizer recovers them.
 
-Panel (b): the trend is approximately $1/\lambda_k$ — the dashed guide is
-purely qualitative but the data points hug it. The OPG spectrum is *literally*
-predicting the per-direction recovery error.
+Panel (b): the dashed line is a least-squares fit on the OPG+SGD data
+points; its slope is reported in the panel title. **The slope is close
+to zero** in this setup — OPG and SGD recover *every* eigendirection
+to near-numerical-zero, so there is no $1/\lambda_k$ trend to report
+within their data. The diagnostic prediction is not literally a power law
+in recovery error; it is a statement about *which direction an optimiser's
+failure mode lives in* when one fails. Here, only Adam fails (the red
+cluster sits 3–5 OOM above OPG/SGD), and its failure lives precisely
+along the sloppy directions of $\hat F(\theta^*)$.
 
 Panel (c): Adam's trajectory in the (stiff, sloppy) plane is the smoking gun.
 It reduces stiff-direction error roughly as fast as OPG/SGD but then *travels
@@ -435,6 +455,13 @@ directions.
 
 This is the operational reading of Kunstner, Hennig & Balles (NeurIPS 2019)
 on differentiable ABM calibration.
+
+**On reproducibility**: this is one initialisation. The same comparison
+across $N=15$ random unit-vector inits at the same $d_0=0.14$ is in
+`scripts/14_multiseed_far_from_eq.py`; the result is that **OPG and SGD
+each beat Adam in 15/15 seeds** (median err 0.130 vs Adam 0.325), and OPG
+vs SGD is statistically tied (8 vs 7). The Adam-wanders claim is robust;
+OPG-vs-SGD is a tie. The diagnostic, not the preconditioner, is the value-add.
 """))
 
 # ============================================================== SECTION 4 - PAPER SUITE
