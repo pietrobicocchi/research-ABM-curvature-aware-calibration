@@ -49,11 +49,14 @@ the smallest object that exposes its covariance. We define the
 \label{eq:opg}
 \widehat{F}(\theta) \;=\; \frac{1}{M} \sum_{m=1}^{M} g_m\, g_m^{\top}.
 \end{equation}
-For an MMD U-statistic loss, the residual structure of the unbiased
-estimator \citep{gretton_mmd_2012} licenses interpreting $\widehat F$
-as a stochastic generalised Gauss--Newton (GGN) approximation of the
-loss Hessian near a minimum, independently of any likelihood
-interpretation. \S\ref{sec:intro} sets out the consequence: read this
+Near a minimum of the unbiased MMD U-statistic
+\citep{gretton_mmd_2012}, the loss takes a residual form in which the
+$g_m$ behave as per-seed Jacobian rows of a vanishing residual: the
+per-seed outer product $\widehat F$ is then a stochastic generalised
+Gauss--Newton (GGN) approximation of the loss Hessian, independent of
+any likelihood interpretation. We use this reading throughout as
+motivation for the eigendecomposition, not as a uniform-convergence
+claim. The consequence set out in \S\ref{sec:intro} follows: read this
 way, $\widehat F$ is a diagnostic rather than a Fisher surrogate, and
 the failure mode \citet{kunstner_opg_2019} identified for
 curvature-adaptive optimisers appears here too
