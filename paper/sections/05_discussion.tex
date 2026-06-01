@@ -36,3 +36,9 @@ eigenvectors hold their qualitative shape regardless, and the non-MMD
 falsification ratios grow rather than shrink under the bias.
 Surrogate-gradient bias acts on the magnitudes of $\widehat F$, not on
 the identifiability structure it carries.
+
+Identifying the parameter combinations the data cannot constrain is a
+safety property of a calibration pipeline: a diagnostic that flags an
+overconfident calibration is more useful than one that silently
+passes. The same matrix that delivers the optimisation step delivers
+this flag, on every iterate, at the cost of a single eigendecomposition.
