@@ -1,8 +1,38 @@
 \section{Discussion}
 \label{sec:discussion}
 
-The outer-product-of-gradients matrix is two decades old as a curvature surrogate \citep{schraudolph_sgn_2002,martens_kfac_2015}; we use it for a different purpose. The interesting reading of $\widehat F$ for differentiable agent-based calibration is not as a preconditioner that out-runs Adam, but as a name for the parameter combinations the data cannot constrain --- available before any optimisation step is taken, at the cost of the single eigendecomposition the gradients already buffer. The optimiser-replacement framing does not survive the experiment: OPG-preconditioned Levenberg-Marquardt and SGD reach indistinguishable loss floors on Brock--Hommes, and the diagnostic predicts that neither will recover $\theta^*$ along the sloppy directions. The same matrix tells us \emph{why}.
+The outer-product-of-gradients matrix is two decades old as a
+curvature surrogate
+\citep{schraudolph_sgn_2002,martens_kfac_2015}; we use it for a
+different purpose. For differentiable agent-based calibration, the
+productive reading of $\widehat F$ is not as a preconditioner that
+out-runs Adam but as a name for the parameter combinations the data
+cannot constrain, available before the next update at the cost of one
+eigendecomposition. The optimiser-replacement framing does not
+survive the experiment. OPG-preconditioned Levenberg--Marquardt and
+SGD reach indistinguishable loss floors on Brock--Hommes, and the
+diagnostic predicts that neither will recover $\theta^*$ along the
+sloppy directions; the same matrix tells us why.
 
-The eigenvectors recover parameter combinations a domain expert would derive from the model equations. On Brock--Hommes the stiff direction is the symmetric-bias combination $(b_1 + b_2)/\sqrt{2}$, a combination the per-parameter Jacobian sensitivities of \citet{querabofarull_diffabm_2025} cannot surface; on SIR the sloppy direction is the early-weak-versus-late-strong lockdown degeneracy $f_{\mathrm{lock}} + 0.1\, t_{\mathrm{lock}}$, a real public-health analogue of the timing--intensity confounding that any field epidemiologist will recognise after a fortnight of an outbreak. This is the evidence the diagnostic recovers real identifiability structure, not numerical artefact: structurally correct combinations fall out of $\widehat F$ without being put in.
+The eigenvectors recover parameter combinations a domain expert would
+derive from the model equations. On Brock--Hommes the stiff direction
+is the symmetric-bias combination $(b_1 + b_2)/\sqrt{2}$ --- a
+structure the per-parameter Jacobian sensitivities of
+\citet{querabofarull_diffabm_2025} cannot surface. On SIR the sloppy
+direction is the early-weak-versus-late-strong lockdown degeneracy
+$f_{\mathrm{lock}} + 0.1\, t_{\mathrm{lock}}$, a public-health analogue
+of the timing--intensity confounding any field epidemiologist will
+recognise a fortnight into an outbreak. Structurally correct
+combinations fall out of $\widehat F$ without being put in --- evidence
+that the diagnostic recovers real identifiability structure, not
+numerical artefact.
 
-The discrete-state network-SIR with Gumbel-Sigmoid surrogate transitions \citep{maddison_concrete_2017,jang_gumbel_2017} biases the gradients by construction, yet the eigenvectors stay qualitatively correct and the non-MMD falsification ratios grow, not shrink, under the bias. The diagnostic therefore transfers to the regime current differentiable-agent-based-modelling work treats as the hard case, suggesting that surrogate-gradient bias acts on the magnitudes of $\widehat F$ but not on the identifiability structure it identifies.
+The network-SIR setting is the hardest of the three by construction.
+Discrete-state transitions are reparameterised through a Gumbel-Sigmoid
+surrogate \citep{maddison_concrete_2017,jang_gumbel_2017} whose
+gradients are biased estimators of the true response, exactly the
+regime in which $\widehat F$ might be expected to mislead. The
+eigenvectors hold their qualitative shape regardless, and the non-MMD
+falsification ratios grow rather than shrink under the bias.
+Surrogate-gradient bias acts on the magnitudes of $\widehat F$, not on
+the identifiability structure it carries.
