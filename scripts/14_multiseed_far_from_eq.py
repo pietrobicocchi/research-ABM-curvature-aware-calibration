@@ -120,7 +120,7 @@ def run_three(theta0: jax.Array, Y_ref: jax.Array, seed_idx: int) -> dict:
 
 def main() -> None:
     apply_style()
-    out_dir = Path("outputs")
+    out_dir = Path("outputs/brock_hommes")
     out_dir.mkdir(exist_ok=True)
 
     # Reference.

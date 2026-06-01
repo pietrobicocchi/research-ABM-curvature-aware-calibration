@@ -75,7 +75,7 @@ def make_sim(grad_horizon):
 
 def main() -> None:
     apply_style()
-    out = Path("outputs")
+    out = Path("outputs/brock_hommes")
     out.mkdir(exist_ok=True)
 
     # Build a reference distribution at theta*, using full-horizon simulator

@@ -69,7 +69,7 @@ def tail_quantiles(X, qs=(0.01, 0.05, 0.95, 0.99)):
 def main() -> None:
     apply_style()
 
-    log_path = Path("outputs/calibration_log.npz")
+    log_path = Path("outputs/brock_hommes/calibration_log.npz")
     if not log_path.exists():
         raise FileNotFoundError(
             "outputs/calibration_log.npz not found. Run "
@@ -248,7 +248,7 @@ def main() -> None:
         "§5.4 Falsification: sloppy vs stiff perturbations under non-MMD discrepancies",
         fontsize=14, fontweight="bold", y=0.995,
     )
-    p = save(fig, "08_falsification.png")
+    p = save(fig, "08_falsification.png", out_dir="outputs/brock_hommes")
     print(f"saved {p}")
 
     # Console summary.

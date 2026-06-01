@@ -151,7 +151,7 @@ def main() -> None:
                  fontsize=14, fontweight="bold")
     fig.tight_layout(rect=(0, 0, 1, 0.96))
 
-    out = Path("outputs") / "07_optimizer_comparison.png"
+    out = Path("outputs/brock_hommes") / "07_optimizer_comparison.png"
     fig.savefig(out, dpi=130, bbox_inches="tight")
     plt.close(fig)
     print(f"saved {out}")

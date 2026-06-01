@@ -100,7 +100,7 @@ def main() -> None:
     fig.suptitle(r"MMD$^2$ loss landscape: slice over $(g_1, g_2)$, other params at truth",
                  fontsize=13, fontweight="bold", y=1.02)
     fig.tight_layout()
-    p = save(fig, "04_mmd_landscape.png")
+    p = save(fig, "04_mmd_landscape.png", out_dir="outputs/brock_hommes")
     print(f"saved {p}")
 
 

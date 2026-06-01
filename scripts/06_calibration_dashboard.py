@@ -63,7 +63,7 @@ def noise_floor(theta, n_pairs=15, M=64, seed_off=10_000):
 
 def main() -> None:
     apply_style()
-    out = Path("outputs")
+    out = Path("outputs/brock_hommes")
     out.mkdir(exist_ok=True)
 
     # ---------------------------------------------------- run

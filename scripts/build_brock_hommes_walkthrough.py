@@ -889,9 +889,9 @@ def main() -> None:
     }
     nb.metadata["language_info"] = {"name": "python", "version": "3.12"}
 
-    out_dir = Path("notebooks")
+    out_dir = Path("notebooks/brock_hommes")
     out_dir.mkdir(exist_ok=True)
-    nb_path = out_dir / "00_walkthrough.ipynb"
+    nb_path = out_dir / "walkthrough.ipynb"
 
     # Write before executing so partial output is preserved if execution fails.
     nbformat.write(nb, str(nb_path))

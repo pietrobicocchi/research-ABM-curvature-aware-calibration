@@ -50,7 +50,7 @@ def _sim(theta, key):
 
 def main() -> None:
     apply_style()
-    out = Path("outputs")
+    out = Path("outputs/brock_hommes")
 
     # Load Phase 2 raw results.
     npz_path = out / "10_phase2_convergence.npz"

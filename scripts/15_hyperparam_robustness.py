@@ -52,7 +52,7 @@ def _sim(theta, key):
 
 def main() -> None:
     apply_style()
-    out_dir = Path("outputs")
+    out_dir = Path("outputs/brock_hommes")
     out_dir.mkdir(exist_ok=True)
 
     # Reference + OPG eigenbasis at theta*.

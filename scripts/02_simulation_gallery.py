@@ -81,7 +81,7 @@ def main() -> None:
 
     fig.suptitle("Brock–Hommes simulator — regime gallery",
                  fontsize=14, fontweight="bold", y=0.995)
-    p = save(fig, "02_simulation_gallery.png")
+    p = save(fig, "02_simulation_gallery.png", out_dir="outputs/brock_hommes")
     print(f"saved {p}")
 
 

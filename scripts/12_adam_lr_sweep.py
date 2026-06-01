@@ -53,7 +53,7 @@ def _sim(theta, key):
 
 def main() -> None:
     apply_style()
-    out = Path("outputs")
+    out = Path("outputs/brock_hommes")
 
     # Reference at theta*.
     M_ref = 128

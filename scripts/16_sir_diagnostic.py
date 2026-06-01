@@ -75,7 +75,7 @@ def tail_quantiles(X, qs=(0.01, 0.05, 0.95, 0.99)):
 
 def main() -> None:
     apply_style()
-    out_dir = Path("outputs")
+    out_dir = Path("outputs/sir")
     out_dir.mkdir(exist_ok=True)
 
     # Reference distribution at theta*.

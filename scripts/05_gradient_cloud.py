@@ -146,7 +146,7 @@ def main() -> None:
         r"OPG geometry at one $\theta$: the cloud, the spectrum, the content",
         fontsize=13, fontweight="bold", y=1.04,
     )
-    p = save(fig, "05_gradient_cloud.png")
+    p = save(fig, "05_gradient_cloud.png", out_dir="outputs/brock_hommes")
     print(f"saved {p}")
 
 

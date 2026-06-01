@@ -150,7 +150,7 @@ def iters_to_halve(err: np.ndarray) -> int:
 
 def main() -> None:
     apply_style()
-    out = Path("outputs")
+    out = Path("outputs/brock_hommes")
     out.mkdir(exist_ok=True)
 
     # Reference distribution at theta*.

@@ -57,7 +57,7 @@ def main() -> None:
         xs_noisy = simulate(theta, key, T=T, sigma=0.05, x_init=0.0, R=R)
         vars_noisy.append(float(jnp.var(xs_noisy[-500:])))
 
-    out_dir = Path("outputs")
+    out_dir = Path("outputs/brock_hommes")
     out_dir.mkdir(exist_ok=True)
 
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 4))

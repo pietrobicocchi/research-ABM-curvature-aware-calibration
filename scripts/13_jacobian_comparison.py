@@ -63,7 +63,7 @@ def _sim(theta, key):
 
 def main() -> None:
     apply_style()
-    out = Path("outputs")
+    out = Path("outputs/brock_hommes")
     out.mkdir(exist_ok=True)
 
     # Reference distribution at theta*.

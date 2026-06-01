@@ -69,7 +69,7 @@ def main() -> None:
     fig.suptitle("Brock–Hommes deterministic dynamics across regimes",
                  fontsize=14, fontweight="bold", y=0.995)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
-    p = save(fig, "03_phase_portraits.png")
+    p = save(fig, "03_phase_portraits.png", out_dir="outputs/brock_hommes")
     print(f"saved {p}")
 
 

@@ -862,9 +862,9 @@ def main() -> None:
     }
     nb.metadata["language_info"] = {"name": "python", "version": "3.12"}
 
-    out_dir = Path("notebooks")
+    out_dir = Path("notebooks/brock_hommes")
     out_dir.mkdir(exist_ok=True)
-    nb_path = out_dir / "01_paper_figures.ipynb"
+    nb_path = out_dir / "paper.ipynb"
     nbformat.write(nb, str(nb_path))
     print(f"Wrote {nb_path} ({len(cells)} cells). Executing ...")
 
