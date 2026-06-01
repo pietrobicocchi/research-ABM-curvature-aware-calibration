@@ -36,3 +36,18 @@ mlruns/
 *.npz
 *.npy
 checkpoints/
+
+# LaTeX build artefacts
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/main.pdf
+paper/sections/*.aux
+paper/diagrams/*.pdf
+paper/diagrams/*.aux
+paper/diagrams/*.log
