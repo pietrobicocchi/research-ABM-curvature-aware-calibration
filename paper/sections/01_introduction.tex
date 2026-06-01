@@ -1,16 +1,59 @@
 \section{Introduction}
 \label{sec:intro}
 
-Agent-based models are the standard policy instrument for systemic risk, epidemic response, and other domains in which heterogeneous interactions matter and a closed-form likelihood is unavailable. Differentiable agent-based modelling has turned this calibration bottleneck into a tractable gradient-based problem \citep{querabofarull_diffabm_2023,querabofarull_diffabm_2025}: the simulator is written as a chain of automatic-differentiation primitives, parameter gradients of any discrepancy loss are obtained by a single backward pass, and the calibrator computes per-seed gradients on the way to its scalar update.
+Agent-based models are used as policy instruments in epidemic
+response, systemic risk, and other settings where heterogeneous
+interaction is itself the object of study and a closed-form likelihood
+is unavailable. Their calibration --- matching simulator output to
+data without a likelihood --- has long been the bottleneck.
+Differentiable agent-based modelling
+\citep{querabofarull_diffabm_2023,querabofarull_diffabm_2025} has made
+it tractable: the simulator is written as a chain of
+automatic-differentiation primitives, so gradients of any discrepancy
+loss are obtained in a single backward pass and the calibrator arrives
+at every update with a buffer of per-seed gradients in hand. The
+buffer carries information the calibrator has not yet been reading.
 
-Yet first-order optimisers silently fail on these problems. With its default hyperparameters Adam diverges from $\theta^*$ on Brock--Hommes calibration --- not catastrophically, but along a specific direction in parameter space the loss does not constrain, while reaching the same MMD noise floor as a converged run. Existing diagnostics are an offline finite-difference Hessian \citep{naumann_woleske_2024} or per-parameter Jacobian sensitivities \citep{querabofarull_diffabm_2025}: the first is too expensive to run during calibration, the second cannot identify parameter \emph{combinations}. The real culprit is non-identifiability of combinations under the MMD loss, and we make this falsifiable.
+Yet first-order optimisers silently fail on these problems. With its
+default hyperparameters, Adam diverges from $\theta^*$ on
+Brock--Hommes calibration along a specific direction the loss does not
+constrain, reaching the same MMD noise floor as a converged run while
+wandering off in the unconstrained subspace. The available diagnostics
+for such failure are either an offline finite-difference Hessian
+\citep{naumann_woleske_2024}, too expensive to run during calibration,
+or per-parameter Jacobian sensitivities
+\citep{querabofarull_diffabm_2025}, which cannot detect parameter
+\emph{combinations}. The culprit is non-identifiability of those
+combinations under the MMD loss.
 
-\citet{kunstner_opg_2019} showed that the outer-product-of-gradients matrix differs from the Fisher in likelihood maximisation and can mislead curvature-adaptive optimisers; we read the same matrix as the residual generalised Gauss--Newton approximation of the MMD-loss Hessian, where the residual structure of the U-statistic estimator licenses the GGN interpretation independently of any likelihood claim. The failure mode they identified does appear in non-likelihood agent-based calibration --- and it is operationally verifiable from the per-seed gradients the calibrator already computed.
+\citet{kunstner_opg_2019} pointed out that the outer-product-of-gradients
+matrix differs from the Fisher under likelihood maximisation and can
+mislead curvature-adaptive optimisers. We read the same matrix as a
+residual generalised Gauss--Newton approximation of the MMD-loss
+Hessian; the U-statistic structure of the MMD estimator licenses this
+reading independently of any likelihood claim. The failure mode
+Kunstner identified --- gradient-noise covariance misdirecting an
+adaptive optimiser --- appears in non-likelihood agent-based
+calibration as well, and it is detectable from the per-seed gradients
+the calibrator already holds.
 
-\paragraph{Contributions.}
-\begin{itemize}
-\item A live identifiability diagnostic for MMD-calibrated differentiable agent-based models, obtained as a free byproduct of the per-seed gradients the calibrator already needs (\S\ref{sec:method}, Figure~\ref{fig:method}).
-\item A non-circular validation protocol using three discrepancies the calibrator never saw; stiff/sloppy ratios of $10^2$--$10^6$ across three models including a discrete-state network with Gumbel-Sigmoid surrogate gradients (\S\ref{sec:results:falsification}, Figure~\ref{fig:falsification}).
-\item Empirical evidence that the diagnostic predicts where Adam fails: cross-optimiser ratio Adam~$v_P$~/~OPG~$v_1 = \mathbf{9.4 \times 10^4}$ (\S\ref{sec:results:predicts-adam}, Figure~\ref{fig:predicts-adam}).
-\item Demonstration that the diagnostic transfers to a discrete-state network agent-based model under Gumbel-Sigmoid surrogate gradients (\S\ref{sec:results:network-sir}, Figure~\ref{fig:network-sir}).
-\end{itemize}
+The contribution is a single live diagnostic, evidenced by three
+independent checks. The eigendecomposition of the OPG matrix,
+computed from the per-seed gradient buffer at no marginal cost, names
+the parameter combinations the data cannot constrain before the next
+update is taken (\S\ref{sec:method}, Figure~\ref{fig:method}). Three
+discrepancies the calibrator never saw --- chosen to break
+circularity with the MMD training loss --- agree with the diagnostic
+across three structurally different models, with stiff/sloppy ratios
+from $\mathbf{489\times}$ to $\mathbf{9.3 \times 10^5}$
+(\S\ref{sec:results:falsification}, Figure~\ref{fig:falsification}).
+The diagnostic predicts the direction of Adam's failure: across $25$
+seeds spanning a financial heterogeneous-agent model and a mean-field
+epidemic model, divergence runs along the flagged sloppy combination,
+with cross-optimiser recovery-error ratio $\mathbf{9.4 \times 10^4}$
+(\S\ref{sec:results:predicts-adam}, Figure~\ref{fig:predicts-adam}).
+And the diagnostic survives the discrete-state regime: on a network
+SIR model with Gumbel-Sigmoid surrogate gradients, the eigenstructure
+remains qualitatively correct and the held-out ratios grow rather
+than shrink (\S\ref{sec:results:network-sir},
+Figure~\ref{fig:network-sir}).
