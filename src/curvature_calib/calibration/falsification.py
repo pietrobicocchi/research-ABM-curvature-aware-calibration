@@ -1,4 +1,3 @@
-# src/curvature_calib/calibration/falsification.py
 """Falsification protocol: perturbation along stiff/sloppy OPG directions.
 
 Tests whether OPG-flagged non-identifiabilities are simulator-intrinsic
@@ -19,6 +18,7 @@ import numpy as np
 from scipy import stats as sps
 
 from curvature_calib.calibration.diagnostic import EigDecomp
+from curvature_calib.calibration.per_seed_grads import vmap_simulate
 
 
 @dataclass
@@ -68,9 +68,9 @@ def acf_difference(X: np.ndarray, Y: np.ndarray, max_lag: int = 20) -> float:
     def _mean_acf(Z: np.ndarray) -> np.ndarray:
         out = np.zeros(max_lag + 1)
         for row in Z:
-            row = row - row.mean()
-            var = row.var() + 1e-12
-            out += np.array([np.mean(row[:len(row)-k] * row[k:]) / var
+            centered = row - row.mean()
+            var = centered.var() + 1e-12
+            out += np.array([np.mean(centered[:len(centered)-k] * centered[k:]) / var
                              for k in range(max_lag + 1)])
         return out / Z.shape[0]
     return float(np.max(np.abs(_mean_acf(X) - _mean_acf(Y))))
@@ -104,8 +104,6 @@ def run_falsification(
     alpha in alpha_grid, simulate M seeds, compute three discrepancies vs
     baseline trajectories at theta_T.
     """
-    from curvature_calib.calibration.per_seed_grads import vmap_simulate
-
     key, k_base = jax.random.split(key)
     base_keys = jax.random.split(k_base, M)
     X_base = np.asarray(vmap_simulate(simulate_fn, theta_T, base_keys))
