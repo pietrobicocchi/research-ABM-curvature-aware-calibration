@@ -26,8 +26,8 @@ import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import stats as sps
 
+from curvature_calib.calibration.falsification import moments_difference, quantile_difference
 from curvature_calib.calibration.opg import eigendecompose
 from curvature_calib.calibration.per_seed_grads import vmap_simulate
 from curvature_calib.models.brock_hommes import simulate
@@ -53,17 +53,6 @@ def autocorr_mean(X, max_lag=20):
         out += np.array([np.mean(x[: x.size - k] * x[k:]) / var
                           for k in range(max_lag + 1)])
     return out / X.shape[0]
-
-
-def four_moments(X):
-    x = X.reshape(-1)
-    return np.array([x.mean(), x.std(),
-                     float(sps.skew(x)), float(sps.kurtosis(x))])
-
-
-def tail_quantiles(X, qs=(0.01, 0.05, 0.95, 0.99)):
-    x = X.reshape(-1)
-    return np.array([np.quantile(x, q) for q in qs])
 
 
 def main() -> None:
@@ -118,13 +107,13 @@ def main() -> None:
 
     # Discrepancies relative to theta_T.
     def disc_moments(X_a):
-        return np.abs(four_moments(X_a) - four_moments(X_T))
+        return moments_difference(X_a, X_T)
 
     def disc_acf(X_a):
         return np.abs(autocorr_mean(X_a) - autocorr_mean(X_T))
 
     def disc_quant(X_a):
-        return np.abs(tail_quantiles(X_a) - tail_quantiles(X_T))
+        return quantile_difference(X_a, X_T)
 
     # Aggregate scalar disagreement: sum over the relevant components.
     rows = []

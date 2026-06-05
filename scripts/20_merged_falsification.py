@@ -34,8 +34,8 @@ jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import stats as sps
 
+from curvature_calib.calibration.falsification import moments_difference, quantile_difference
 from curvature_calib.calibration.opg import eigendecompose
 from curvature_calib.calibration.per_seed_grads import (
     per_seed_loss_and_grads,
@@ -116,12 +116,6 @@ MODEL_CONFIGS = [
 # ---------------------------------------------------------------------------
 # Non-MMD discrepancy library.
 
-def four_moments(X):
-    x = np.asarray(X).reshape(-1)
-    return np.array([x.mean(), x.std(),
-                     float(sps.skew(x)), float(sps.kurtosis(x))])
-
-
 def autocorr_mean(X, max_lag=20):
     X = np.asarray(X)
     out = np.zeros(max_lag + 1)
@@ -133,16 +127,12 @@ def autocorr_mean(X, max_lag=20):
     return out / X.shape[0]
 
 
-def tail_quantiles(X, qs=(0.01, 0.05, 0.95, 0.99)):
-    x = np.asarray(X).reshape(-1)
-    return np.array([np.quantile(x, q) for q in qs])
-
-
 def discrepancies(X_T, X_a):
+    X_T_np, X_a_np = np.asarray(X_T), np.asarray(X_a)
     return {
-        "moments": float(np.sum(np.abs(four_moments(X_a) - four_moments(X_T)))),
-        "ACF":     float(np.sum(np.abs(autocorr_mean(X_a) - autocorr_mean(X_T)))),
-        "quant":   float(np.sum(np.abs(tail_quantiles(X_a) - tail_quantiles(X_T)))),
+        "moments": float(np.sum(moments_difference(X_a_np, X_T_np))),
+        "ACF":     float(np.sum(np.abs(autocorr_mean(X_a_np) - autocorr_mean(X_T_np)))),
+        "quant":   float(np.sum(quantile_difference(X_a_np, X_T_np))),
     }
 
 
