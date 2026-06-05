@@ -1,4 +1,3 @@
-# src/curvature_calib/models/network_sir.py
 """Network-SIR with configurable surrogate gradients.
 
 Discrete-state SIR on a fixed contact graph. Surrogate for discrete Bernoulli
@@ -95,16 +94,19 @@ def simulate(
     """Run one network-SIR trajectory of length T.
 
     surrogate: "gumbel" uses Gumbel-Sigmoid at temperature gumbel_tau (default);
-               "straight_through" uses hard Bernoulli with straight-through gradient.
+               "straight_through" uses hard Bernoulli with straight-through gradient
+               (gumbel_tau is ignored in this case).
     graph_seed is fixed across simulation seeds — the contact graph is shared.
     """
     params = pack(theta)
     A = build_er_graph(N, mean_degree, jax.random.PRNGKey(graph_seed))
 
-    if surrogate == "straight_through":
+    if surrogate == "gumbel":
+        surrogate_fn = partial(gumbel_sigmoid, tau=gumbel_tau)
+    elif surrogate == "straight_through":
         surrogate_fn = straight_through_bernoulli
     else:
-        surrogate_fn = partial(gumbel_sigmoid, tau=gumbel_tau)
+        raise ValueError(f"Unknown surrogate {surrogate!r}; expected 'gumbel' or 'straight_through'")
 
     k_priors, k_steps = jax.random.split(key)
     node_priorities = jax.random.uniform(k_priors, (N,), dtype=theta.dtype)
