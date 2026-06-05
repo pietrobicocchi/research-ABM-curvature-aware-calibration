@@ -36,6 +36,9 @@ def principal_angles(V1: jax.Array, V2: jax.Array) -> jax.Array:
     Both must have the same number of columns. Returns one angle per column,
     sorted ascending (smallest first). Reference: Bjorck & Golub 1973.
     """
+    assert V1.shape[1] == V2.shape[1], (
+        f"V1 and V2 must have the same number of columns, got {V1.shape[1]} vs {V2.shape[1]}"
+    )
     Q1, _ = jnp.linalg.qr(V1)
     Q2, _ = jnp.linalg.qr(V2)
     s = jnp.linalg.svd(Q1.T @ Q2, compute_uv=False)
