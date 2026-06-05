@@ -19,6 +19,7 @@ import jax.numpy as jnp
 
 from curvature_calib.calibration.opg import eigendecompose
 from curvature_calib.calibration.per_seed_grads import (
+    loss_only,
     per_seed_loss_and_grads,
     vmap_simulate,
 )
@@ -27,8 +28,6 @@ from curvature_calib.calibration.preconditioner import (
     quadratic_model_reduction,
     update_damping,
 )
-from curvature_calib.losses.mmd import mmd_sq_with_median_bandwidth
-
 
 @dataclass
 class CalibLog:
@@ -55,11 +54,6 @@ class CalibLog:
             "per_seed_grads": np.asarray(self.per_seed_grads),
             "dampings": np.asarray(self.dampings),
         }
-
-
-def _loss_only(simulate_fn, theta, keys, Y_ref):
-    X = vmap_simulate(simulate_fn, theta, keys)
-    return mmd_sq_with_median_bandwidth(X, Y_ref)
 
 
 def calibrate(
@@ -100,13 +94,13 @@ def calibrate(
         keys = jax.random.split(jax.random.fold_in(master, t), M)
         stats = per_seed_loss_and_grads(simulate_fn, theta, keys, Y_ref)
         L_curr = float(stats.loss)
-        L_val = float(_loss_only(simulate_fn, theta, val_keys, Y_ref))
+        L_val = float(loss_only(simulate_fn, theta, val_keys, Y_ref))
 
         eig = eigendecompose(stats.opg)
 
         step = learning_rate * damped_step(stats.opg, stats.mean_grad, damping)
         theta_proposed = theta + step
-        L_prop = float(_loss_only(simulate_fn, theta_proposed, keys, Y_ref))
+        L_prop = float(loss_only(simulate_fn, theta_proposed, keys, Y_ref))
 
         pred = quadratic_model_reduction(stats.opg, stats.mean_grad, step, damping)
 
@@ -146,6 +140,6 @@ def calibrate(
             )
 
     keys = jax.random.split(jax.random.fold_in(master, n_iter), M)
-    log.losses.append(float(_loss_only(simulate_fn, theta, keys, Y_ref)))
-    log.val_losses.append(float(_loss_only(simulate_fn, theta, val_keys, Y_ref)))
+    log.losses.append(float(loss_only(simulate_fn, theta, keys, Y_ref)))
+    log.val_losses.append(float(loss_only(simulate_fn, theta, val_keys, Y_ref)))
     return log

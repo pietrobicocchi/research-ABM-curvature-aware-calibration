@@ -81,3 +81,14 @@ def per_seed_loss_and_grads(
     opg = (per_seed.T @ per_seed) / M                  # (P, P)
     return CalibStats(loss=L, mean_grad=mean_grad,
                       per_seed_grads=per_seed, opg=opg)
+
+
+def loss_only(
+    simulate_fn: Callable,
+    theta: jax.Array,
+    keys: jax.Array,
+    Y_ref: jax.Array,
+) -> jax.Array:
+    """MMD² for a given theta without computing gradients."""
+    X = vmap_simulate(simulate_fn, theta, keys)
+    return mmd_sq_with_median_bandwidth(X, Y_ref)

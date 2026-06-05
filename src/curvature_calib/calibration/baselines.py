@@ -12,11 +12,10 @@ import jax
 import jax.numpy as jnp
 
 from curvature_calib.calibration.per_seed_grads import (
+    loss_only,
     per_seed_loss_and_grads,
     vmap_simulate,
 )
-from curvature_calib.losses.mmd import mmd_sq_with_median_bandwidth
-
 
 @dataclass
 class FirstOrderLog:
@@ -35,11 +34,6 @@ class FirstOrderLog:
         }
 
 
-def _loss_only(simulate_fn, theta, keys, Y_ref):
-    X = vmap_simulate(simulate_fn, theta, keys)
-    return mmd_sq_with_median_bandwidth(X, Y_ref)
-
-
 def sgd(simulate_fn: Callable, theta0, Y_ref, M=64, n_iter=80,
         lr=1e-2, seed_base=0, verbose=False,
         val_M=None, val_seed=999_999) -> FirstOrderLog:
@@ -52,15 +46,15 @@ def sgd(simulate_fn: Callable, theta0, Y_ref, M=64, n_iter=80,
         keys = jax.random.split(jax.random.fold_in(master, t), M)
         stats = per_seed_loss_and_grads(simulate_fn, theta, keys, Y_ref)
         log.losses.append(float(stats.loss))
-        log.val_losses.append(float(_loss_only(simulate_fn, theta, val_keys, Y_ref)))
+        log.val_losses.append(float(loss_only(simulate_fn, theta, val_keys, Y_ref)))
         log.mean_grads.append(stats.mean_grad)
         theta = theta - lr * stats.mean_grad
         log.thetas.append(theta)
         if verbose and t % 10 == 0:
             print(f"  SGD iter {t}  L={float(stats.loss):.4e}  val={log.val_losses[-1]:+.3e}")
     keys = jax.random.split(jax.random.fold_in(master, n_iter), M)
-    log.losses.append(float(_loss_only(simulate_fn, theta, keys, Y_ref)))
-    log.val_losses.append(float(_loss_only(simulate_fn, theta, val_keys, Y_ref)))
+    log.losses.append(float(loss_only(simulate_fn, theta, keys, Y_ref)))
+    log.val_losses.append(float(loss_only(simulate_fn, theta, val_keys, Y_ref)))
     return log
 
 
@@ -78,7 +72,7 @@ def adam(simulate_fn: Callable, theta0, Y_ref, M=64, n_iter=80,
         keys = jax.random.split(jax.random.fold_in(master, t), M)
         stats = per_seed_loss_and_grads(simulate_fn, theta, keys, Y_ref)
         log.losses.append(float(stats.loss))
-        log.val_losses.append(float(_loss_only(simulate_fn, theta, val_keys, Y_ref)))
+        log.val_losses.append(float(loss_only(simulate_fn, theta, val_keys, Y_ref)))
         log.mean_grads.append(stats.mean_grad)
         g = stats.mean_grad
         m = b1 * m + (1 - b1) * g
@@ -90,6 +84,6 @@ def adam(simulate_fn: Callable, theta0, Y_ref, M=64, n_iter=80,
         if verbose and t % 10 == 0:
             print(f"  Adam iter {t}  L={float(stats.loss):.4e}  val={log.val_losses[-1]:+.3e}")
     keys = jax.random.split(jax.random.fold_in(master, n_iter + 1), M)
-    log.losses.append(float(_loss_only(simulate_fn, theta, keys, Y_ref)))
-    log.val_losses.append(float(_loss_only(simulate_fn, theta, val_keys, Y_ref)))
+    log.losses.append(float(loss_only(simulate_fn, theta, keys, Y_ref)))
+    log.val_losses.append(float(loss_only(simulate_fn, theta, val_keys, Y_ref)))
     return log
