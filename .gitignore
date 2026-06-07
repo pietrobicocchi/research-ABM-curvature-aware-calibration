@@ -25,6 +25,9 @@ dist/
 .idea/
 .DS_Store
 
+# Brainstorming companion (local mockups)
+.superpowers/
+
 # Notebooks
 .ipynb_checkpoints/
 
