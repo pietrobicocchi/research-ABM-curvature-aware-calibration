@@ -23,3 +23,5 @@ fig_09_trajectory: "Tracking the OPG spectrum, effective dimension, and eigenvec
 fig_10_bootstrap: "Bootstrap confidence intervals on the eigenvalues and the noise floor that defines the effective dimension."
 fig_11_falsification: "The falsification protocol and its result: sloppy-direction perturbations are indistinguishable under three non-MMD discrepancies."
 fig_12_jacobian_vs_opg: "Per-parameter Jacobian sensitivity versus OPG eigenvalues: F surfaces parameter combinations the Jacobian misses."
+fig_13_indistinguishable: "Same perturbation size in parameter space: stiff-direction displacements separate price/epidemic distributions; sloppy-direction displacements leave outputs indistinguishable—the lockdown fires after the epidemic is over."
+fig_14_sir_temporal: "Time-varying identifiability in the mean-field SIR: I_0 is constrained from the first observations, beta and gamma peak at the epidemic, and the lockdown parameters (t_lock, f_lock) remain non-identifiable throughout because the epidemic is over before the policy fires."
