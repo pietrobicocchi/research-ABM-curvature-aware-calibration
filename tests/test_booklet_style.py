@@ -31,3 +31,26 @@ def test_save_vector_writes_pdf_and_png(tmp_path):
     assert paths["pdf"] == tmp_path / "demo.pdf"
     assert paths["png"] == tmp_path / "demo.png"
     plt.close(fig)
+
+
+from curvature_calib.viz import booklet_annotate
+
+
+def test_callout_adds_annotation():
+    booklet_style.apply_booklet_style()
+    fig, ax = plt.subplots()
+    ax.plot([0, 1], [0, 1])
+    n_before = len(ax.texts)
+    booklet_annotate.callout(ax, (0.5, 0.5), "stiff", (0.7, 0.2))
+    assert len(ax.texts) == n_before + 1
+    plt.close(fig)
+
+
+def test_tag_stiff_sloppy_adds_two_texts():
+    booklet_style.apply_booklet_style()
+    fig, ax = plt.subplots()
+    ax.bar(range(5), [5, 4, 3, 2, 1])
+    n_before = len(ax.texts)
+    booklet_annotate.tag_stiff_sloppy(ax, stiff_xy=(0, 5), sloppy_xy=(4, 1))
+    assert len(ax.texts) == n_before + 2
+    plt.close(fig)
