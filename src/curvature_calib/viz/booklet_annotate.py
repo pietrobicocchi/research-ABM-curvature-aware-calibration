@@ -1,8 +1,6 @@
 """In-figure annotation helpers for the booklets (explainer-style callouts)."""
 from __future__ import annotations
 
-import matplotlib.pyplot as plt
-
 from curvature_calib.viz.style import QUAL
 
 STIFF_COLOR = QUAL[1]   # warm red
