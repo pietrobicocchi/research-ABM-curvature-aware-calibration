@@ -24,8 +24,8 @@ _GREY        = "#7f8c8d"
 
 # Box dimensions
 _BOX_H_STD   = 0.80   # standard box height
-_BOX_W_STD   = 2.00   # standard box width
-_BOX_W_WIDE  = 2.20   # wider box for multi-line content
+_BOX_W_STD   = 1.90   # standard box width
+_BOX_W_WIDE  = 2.00   # wider box for multi-line content
 
 # Main spine Y (centre)
 _Y_SPINE     = 3.50
@@ -40,9 +40,9 @@ _X_SIM       = 3.60   # "simulate M seeds"
 _X_HUB       = 6.10   # "{g_m} hub" — branching point
 
 # X positions for branch boxes (top and bottom share same x grid)
-_X_MEAN_G    = 8.30   # "mean gradient" / "OPG matrix"
-_X_STEP      = 10.50  # "gradient step" / "eigendecompose"
-_X_DIAG      = 12.40  # "identifiability diagnostic" (bottom only)
+_X_MEAN_G    = 8.40   # "mean gradient" / "OPG matrix"
+_X_STEP      = 11.00  # "gradient step" / "eigendecompose"
+_X_DIAG      = 13.50  # "identifiability diagnostic" (bottom only)
 
 
 def _add_box(
@@ -100,9 +100,9 @@ def _arrow(ax, x_start, y_start, x_end, y_end,
 
 def main() -> None:
     apply_booklet_style()
-    fig, ax = plt.subplots(figsize=(13, 7))
+    fig, ax = plt.subplots(figsize=(14, 7))
     ax.axis("off")
-    ax.set_xlim(0, 14)
+    ax.set_xlim(0, 15)
     ax.set_ylim(0, 7)
 
     # ── 1. Main spine boxes ───────────────────────────────────────────────────
@@ -204,16 +204,16 @@ def main() -> None:
     # Fix: start at the right edge of the source box, end at the destination
     # centre — this guarantees posA.x < posB.x for both arrows.
 
-    # OPG right edge → eigendecompose centre  (arrowhead on eigendecompose)
+    # OPG right edge → eigendecompose left edge  (arrowhead on eigendecompose)
     _arrow(ax,
            _X_MEAN_G + (_BOX_W_WIDE + 0.2) / 2, _Y_BOT,
-           _X_STEP, _Y_BOT,
+           _X_STEP - _BOX_W_WIDE / 2, _Y_BOT,
            color=QUAL[1])
 
-    # eigendecompose right edge → diagnostic centre  (arrowhead on diagnostic)
+    # eigendecompose right edge → diagnostic left edge  (arrowhead on diagnostic)
     _arrow(ax,
            _X_STEP + _BOX_W_WIDE / 2, _Y_BOT,
-           _X_DIAG, _Y_BOT,
+           _X_DIAG - _BOX_W_WIDE / 2, _Y_BOT,
            color=QUAL[1])
 
     # ── 8. Feedback loop: gradient step → θ_t ────────────────────────────────
