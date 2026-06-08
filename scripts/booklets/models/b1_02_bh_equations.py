@@ -124,7 +124,7 @@ def main() -> None:
         )
         # Description
         ax.text(
-            _DESC_X, y_row, r"$-$\;" + desc,
+            _DESC_X, y_row, "— " + desc,
             ha="left", va="center",
             fontsize=10, color="#444444",
         )
