@@ -77,7 +77,7 @@ def main() -> None:
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.axis("off")
     ax.set_xlim(0, 10)
-    ax.set_ylim(0, 6)
+    ax.set_ylim(-1.2, 6)
 
     # ── 1. LEFT box — past performance ───────────────────────────────────────
     _add_box(
@@ -136,16 +136,24 @@ def main() -> None:
            _X_RIGHT - (_BOX_W + 0.3) / 2, _Y_RIGHT - 0.25)
 
     # ── 4c. Curved feedback arrow: market price → past performance ────────────
-    _arrow(ax,
-           _X_RIGHT - (_BOX_W + 0.3) / 2, _Y_RIGHT - 0.55,
-           _X_LEFT  + (_BOX_W + 0.3) / 2, _Y_LEFT  - 0.55,
-           connectionstyle="arc3,rad=-0.40")
+    # Arc travels well below all boxes (below y≈1.6) so it crosses nothing.
+    _fb_y = _Y_BOT - _BOX_H / 2   # bottom edge of the lower type box
+    ax.add_patch(mpatches.FancyArrowPatch(
+        (_X_RIGHT, _fb_y),          # bottom-centre of "Market price" box
+        (_X_LEFT,  _fb_y),          # bottom-centre of "Past performance" box
+        arrowstyle="-|>",
+        mutation_scale=18,
+        connectionstyle="arc3,rad=-0.45",   # negative → bows downward
+        color="#7f8c8d", linewidth=1.5, zorder=1,
+    ))
 
-    # Label the feedback arc
+    # Label centred on the lowest point of the arc
     ax.text(
-        5.00, 0.62, "fitness feedback",
+        (_X_LEFT + _X_RIGHT) / 2, _fb_y - 0.62,
+        "fitness feedback",
         ha="center", va="center", fontsize=8.5, fontstyle="italic",
         color="#555555", zorder=5,
+        bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="none"),
     )
 
     # ── 5. Callout: switching rule ─────────────────────────────────────────────
