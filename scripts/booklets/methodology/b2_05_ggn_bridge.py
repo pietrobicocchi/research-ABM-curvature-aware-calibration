@@ -120,10 +120,9 @@ def main() -> None:
         transform=ax.transAxes,
         bbox=dict(
             boxstyle="round,pad=0.45",
-            fc=QUAL[0] + "22",   # very light tint
+            fc="#e8ecf7",   # light blue tint (solid, so dark text stays legible)
             ec=QUAL[0],
             lw=1.8,
-            alpha=0.95,
         ),
     )
 
