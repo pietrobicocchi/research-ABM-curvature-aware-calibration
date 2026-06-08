@@ -132,14 +132,16 @@ def main() -> None:
             color=SLOPPY_COLOR, fontweight="bold")
 
     # ── Panel (b): SNR ────────────────────────────────────────────────────────
-    bar_colors = [STIFF_COLOR if s > 10 else
-                  ("#e67e22" if s > 2 else SLOPPY_COLOR)
-                  for s in snr]
+    # Colour by rank, not by SNR threshold: v₁ = stiff (red), v_P = sloppy (grey),
+    # intermediate directions = QUAL[0].  The sloppy eigenvalue sits at the absolute
+    # noise floor even though its relative SNR is ~9 (bootstrap variance is
+    # proportionally small); the rank-based colouring matches the panel (a) story.
+    bar_colors = [
+        STIFF_COLOR if k == 0 else (SLOPPY_COLOR if k == P - 1 else QUAL[0])
+        for k in range(P)
+    ]
     ax_snr.bar(xs, snr, color=bar_colors, alpha=0.82, width=0.6,
                edgecolor="white", linewidth=0.8)
-    ax_snr.axhline(2.0, color="#bbbbbb", ls="--", lw=1.0)
-    ax_snr.text(P - 0.5, 2.3, "SNR = 2", ha="right",
-                fontsize=8, color="#999")
     ax_snr.set_xticks(xs)
     ax_snr.set_xticklabels(labels)
     ax_snr.set_ylabel(r"SNR  $= \lambda_k\,/\,\hat\sigma_k^{\,\rm boot}$")
@@ -147,7 +149,7 @@ def main() -> None:
     ax_snr.set_yscale("log")
 
     ax_snr.text(0.97, 0.97,
-                "red  = stiff (high SNR)\ngrey = sloppy (noise floor)",
+                "red  = stiff ($v_1$)\ngrey = sloppy ($v_P$)",
                 transform=ax_snr.transAxes, ha="right", va="top",
                 fontsize=8, color="#555",
                 bbox=dict(fc="white", ec="grey", alpha=0.8,

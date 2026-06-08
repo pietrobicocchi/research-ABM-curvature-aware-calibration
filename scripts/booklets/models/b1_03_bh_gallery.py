@@ -92,8 +92,10 @@ def main() -> None:
     axes[-1, 1].set_xlabel("lag")
 
     fig.suptitle(
-        r"Brock–Hommes regimes: intensity of choice $\beta$ shapes persistence",
-        fontweight="bold",
+        r"Brock–Hommes regimes: $\beta$ and agent-type mix jointly shape persistence"
+        "\n"
+        r"(chaotic $\beta=10$ most persistent; fundamental/periodic differ via agent parameters)",
+        fontweight="bold", fontsize=10,
     )
     fig.tight_layout()
 

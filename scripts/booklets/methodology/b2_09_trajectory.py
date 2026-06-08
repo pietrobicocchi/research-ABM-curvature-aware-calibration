@@ -120,13 +120,21 @@ def main() -> None:
     ax_deff.set_ylabel(r"$d_{\rm eff}$", fontsize=9)
     ax_deff.set_xlabel("calibration iteration")
 
-    # Annotate near-1 value
+    # Annotate mean d_eff as a horizontal dashed line + label
+    ax_deff.axhline(d_eff.mean(), color=QUAL[0], ls="--", lw=1.0, alpha=0.7)
+    ax_deff.text(
+        _T - 1, d_eff.mean(),
+        rf" mean $\approx${d_eff.mean():.2f}",
+        va="bottom", ha="right", fontsize=8, color=QUAL[0],
+    )
+    # Separately annotate the transient spike
+    spike_t = int(t_axis[d_eff.argmax()])
     ax_deff.annotate(
-        rf"$d_{{\rm eff}}\approx{d_eff.mean():.2f}$  (one direction dominates)",
-        xy=(t_axis[d_eff.argmax()], d_eff.max()),
-        xytext=(38, max(d_eff) * 1.08),
-        fontsize=8, color=QUAL[0],
-        arrowprops=dict(arrowstyle="->", color=QUAL[0], lw=0.9),
+        rf"spike: {d_eff.max():.1f}",
+        xy=(spike_t, d_eff.max()),
+        xytext=(spike_t + 4, d_eff.max() * 0.95),
+        fontsize=7.5, color=_GREY, ha="left",
+        arrowprops=dict(arrowstyle="->", color=_GREY, lw=0.8),
     )
 
     # ── Panel (c): bootstrap principal angles ─────────────────────────────────
