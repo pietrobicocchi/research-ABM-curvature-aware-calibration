@@ -199,17 +199,21 @@ def main() -> None:
            color=_GREY)
 
     # ── 7. Arrows — bottom branch ─────────────────────────────────────────────
+    # Boxes nearly touch (OPG right edge 9.50, eigen left edge 9.40), so
+    # using exact edge-to-edge coords gives posA.x > posB.x → right-to-left.
+    # Fix: start at the right edge of the source box, end at the destination
+    # centre — this guarantees posA.x < posB.x for both arrows.
 
-    # OPG → eigendecompose
+    # OPG right edge → eigendecompose centre  (arrowhead on eigendecompose)
     _arrow(ax,
            _X_MEAN_G + (_BOX_W_WIDE + 0.2) / 2, _Y_BOT,
-           _X_STEP - _BOX_W_WIDE / 2, _Y_BOT,
+           _X_STEP, _Y_BOT,
            color=QUAL[1])
 
-    # eigendecompose → diagnostic
+    # eigendecompose right edge → diagnostic centre  (arrowhead on diagnostic)
     _arrow(ax,
            _X_STEP + _BOX_W_WIDE / 2, _Y_BOT,
-           _X_DIAG - _BOX_W_WIDE / 2, _Y_BOT,
+           _X_DIAG, _Y_BOT,
            color=QUAL[1])
 
     # ── 8. Feedback loop: gradient step → θ_t ────────────────────────────────
@@ -222,11 +226,11 @@ def main() -> None:
         connectionstyle="arc3,rad=-0.38",
         color=_GREY, linewidth=1.5, zorder=1,
     ))
-    # "iterate" label on the outer arc — placed above the top branch
-    ax.text((_X_PARAMS + _X_STEP) / 2 + 0.8, 6.55,
+    # "iterate" label — sits on the feedback arc near its visible apex.
+    ax.text(6.5, 5.95,
             "iterate",
             ha="center", va="center", fontsize=8, fontstyle="italic",
-            color=_GREY, zorder=5,
+            color=_GREY, zorder=6,
             bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="none", alpha=0.9))
 
     # ── 9. Callout: OPG already in memory ────────────────────────────────────
