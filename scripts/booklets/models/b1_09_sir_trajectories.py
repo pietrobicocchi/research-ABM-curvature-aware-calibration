@@ -22,7 +22,6 @@ import jax  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
-jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
@@ -57,6 +56,7 @@ def _mean_std(theta):
 
 
 def main() -> None:
+    jax.config.update("jax_enable_x64", True)
     apply_booklet_style()
 
     off_mean, off_std = _mean_std(THETA_OFF)

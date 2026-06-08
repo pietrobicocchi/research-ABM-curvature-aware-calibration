@@ -20,7 +20,6 @@ import jax  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
-jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
@@ -48,6 +47,7 @@ def _norm(curve: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
 
 
 def main() -> None:
+    jax.config.update("jax_enable_x64", True)
     apply_booklet_style()
 
     # Match R0: mean-field beta = R0*gamma; network beta = R0*gamma/mean_degree.

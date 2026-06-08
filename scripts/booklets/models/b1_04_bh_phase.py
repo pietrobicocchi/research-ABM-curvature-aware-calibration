@@ -15,11 +15,9 @@ import matplotlib
 
 matplotlib.use("Agg")
 import jax  # noqa: E402
+import jax.numpy as jnp  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-
-jax.config.update("jax_enable_x64", True)
-import jax.numpy as jnp  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from curvature_calib.models.brock_hommes import simulate  # noqa: E402
@@ -30,11 +28,6 @@ from scripts.booklets._figbase import out_dir  # noqa: E402
 OUT_AREA = "models"
 OUT_NAME = "fig_04_bh_phase"
 
-_THETA = {
-    "fundamental": jnp.array([1.0,  0.5,  0.0,  0.5,  0.0], dtype=jnp.float64),
-    "periodic":    jnp.array([5.0,  1.2,  0.0, -0.5,  0.0], dtype=jnp.float64),
-    "chaotic":     jnp.array([10.0, 1.2,  0.2,  1.2, -0.2], dtype=jnp.float64),
-}
 _LABELS = {
     "fundamental": r"Fundamental ($\beta=1$)",
     "periodic":    r"Periodic ($\beta=5$)",
@@ -48,6 +41,12 @@ SEED = 0
 
 
 def main() -> None:
+    jax.config.update("jax_enable_x64", True)
+    _THETA = {
+        "fundamental": jnp.array([1.0,  0.5,  0.0,  0.5,  0.0], dtype=jnp.float64),
+        "periodic":    jnp.array([5.0,  1.2,  0.0, -0.5,  0.0], dtype=jnp.float64),
+        "chaotic":     jnp.array([10.0, 1.2,  0.2,  1.2, -0.2], dtype=jnp.float64),
+    }
     apply_booklet_style()
 
     fig, axes = plt.subplots(1, 3, figsize=(11, 3.9))

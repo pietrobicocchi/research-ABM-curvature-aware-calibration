@@ -16,8 +16,6 @@ import matplotlib
 
 matplotlib.use("Agg")
 import jax  # noqa: E402
-
-jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
@@ -39,7 +37,6 @@ OUT_NAME = "fig_10_bootstrap"
 T = 200
 SIGMA = 0.05
 R = 1.1
-THETA_STAR = jnp.array([3.0, 1.2, 0.2, 1.2, -0.2], dtype=jnp.float64)
 N_BOOT = 500
 M = 200
 
@@ -49,13 +46,15 @@ def _sim(theta, key):
 
 
 def main() -> None:
+    jax.config.update("jax_enable_x64", True)
+    theta_star = jnp.array([3.0, 1.2, 0.2, 1.2, -0.2], dtype=jnp.float64)
     apply_booklet_style()
 
     # ── Compute OPG and bootstrap at θ* ───────────────────────────────────────
     ref_keys = jax.random.split(jax.random.PRNGKey(0), M)
-    Y_ref = vmap_simulate(_sim, THETA_STAR, ref_keys)
+    Y_ref = vmap_simulate(_sim, theta_star, ref_keys)
     keys = jax.random.split(jax.random.PRNGKey(7), M)
-    stats = per_seed_loss_and_grads(_sim, THETA_STAR, keys, Y_ref)
+    stats = per_seed_loss_and_grads(_sim, theta_star, keys, Y_ref)
 
     F = np.asarray(stats.opg)
     eig = eigendecompose(jnp.asarray(F))

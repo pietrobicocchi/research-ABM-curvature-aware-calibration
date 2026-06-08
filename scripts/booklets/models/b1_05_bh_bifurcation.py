@@ -20,7 +20,6 @@ import jax  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
-jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
@@ -32,8 +31,6 @@ from scripts.booklets._figbase import out_dir  # noqa: E402
 OUT_AREA = "models"
 OUT_NAME = "fig_05_bh_bifurcation"
 
-# Fixed g, b structure (chaotic-type); only beta varies along the sweep.
-_GB = jnp.array([1.2, 0.2, 1.2, -0.2], dtype=jnp.float64)
 R = 1.1
 T = 800
 N_TRANSIENT = 650          # keep the last T - N_TRANSIENT points
@@ -45,12 +42,14 @@ _REGIME_BETAS = {"fundamental": 1.0, "periodic": 5.0, "chaotic": 10.0}
 
 
 def _tail(beta: float) -> np.ndarray:
-    theta = jnp.concatenate([jnp.array([beta], dtype=jnp.float64), _GB])
+    _gb = jnp.array([1.2, 0.2, 1.2, -0.2], dtype=jnp.float64)
+    theta = jnp.concatenate([jnp.array([beta], dtype=jnp.float64), _gb])
     xs = simulate(theta, KEY, T=T, R=R, sigma=0.0, x_init=X_INIT)
     return np.asarray(xs[N_TRANSIENT:])
 
 
 def main() -> None:
+    jax.config.update("jax_enable_x64", True)
     apply_booklet_style()
 
     betas_plot, xs_plot = [], []
