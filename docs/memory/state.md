@@ -9,7 +9,7 @@ metadata:
 
 Last updated 2026-06-05. **Phase 1 complete** (yellow light, see [[phase1-horizon-bias-result]]). **Phase 2 first pass complete** (H1 speedup hypothesis falsified, but result actually strengthens the diagnostic claim — see [[phase2-convergence-result]]). **Phase 3 complete** (Tier A + Tier B, see [[sir-generalization]]). **Paper draft v1 complete** (commit `08722a3`, 8 main pages + 1 appendix). **Paper v2 naturalness pass complete** (tip `2dfe3e7`; 9 pages; zero undefined references; banned-word grep clean except the allowed `empirical Fisher` meta-disclaimer in `03_method.tex`). **Codebase refactor complete** (2026-06-05): calibration internals split into focused modules, backwards-compat shims in place, 75 tests pass.
 
-**NEXT SESSION**: Phase 4 — write the AI4ABM 2026 paper sections using [[paper-story-arc]]. What still binds: the locked numbers and hero figures (8.4 OOM, 20.7 OOM, 9.4×10⁴, 489×, 25/25, 9.3×10⁵), the LCB scope rules, and the terminology rule in [[framing-kunstner-opg-not-fisher]] (F̂ is the OPG matrix; Kunstner cite stays).
+**NEXT SESSION**: Phase 4 — write the AI4ABM 2026 paper sections using [[paper-story-arc]] (structure locked 2026-06-08). Paper is 6 sections: §1 Intro, §2 Background, §3 Diagnostic (5 subsections inc. §3.5 Falsification Protocol), §4 Experiments (§4.1 BH + §4.2 Network-SIR), §5 Discussion, §6 Future Work; Appendix A (preconditioning) + Appendix B (technical). Working title: *Identifiability Geometry of MMD Calibration in Differentiable Agent-Based Models*. Locked numbers: 8.4 OOM, 20.7 OOM, 9.4×10⁴, 489×, 25/25, 9.3×10⁵. Mean-field SIR is a stepping stone (Fig 2 data + bridge paragraph in §4.2), not a standalone section.
 
 ## Codebase (`src/curvature_calib/`)
 
@@ -144,9 +144,9 @@ Outputs: `outputs/brock_hommes/14_multiseed_far_from_eq.{png,npz}`.
 
 1. **Regenerate Paper Figure 2** (`scripts/20_merged_falsification.py`): requires `outputs/brock_hommes/calibration_log.npz`. Run once to refresh `outputs/paper/20_merged_falsification.{png,npz}` if the source NPZ was affected by the refactor.
 2. **Script 26 confidence intervals**: `scripts/26_horizon_sensitivity_sir.py` — `bootstrap_eigvals` is not yet wired up; add eigenvalue CIs to the horizon-sensitivity plot.
-3. **Phase 4 — write AI4ABM 2026 paper sections**: use [[paper-story-arc]] as the canonical guide. The paper `.tex` sources live in `paper/` (not deleted — only `appendix/supp.tex` was removed). Locked numbers: 8.4 OOM, 20.7 OOM, 9.4×10⁴, 489×, 25/25, 9.3×10⁵.
-4. **Real data**: S&P 500 daily returns calibration of Brock-Hommes under deliberate misspecification (generalised-posterior framing, Phase 4 §week 9) — *strengthens, not blocking*.
-5. N=50+ multi-seed on headline experiments (attack #3) — *strengthens, not blocking*.
-6. Pearson-normalised spectrum reporting (attack #1) — *strengthens, not blocking*.
+3. **Phase 4 — write AI4ABM 2026 paper sections**: canonical structure locked in [[paper-story-arc]] (2026-06-08). Draft order: §1 Intro → §2 Background → §3 Diagnostic → §4 Experiments → §5 Discussion → §6 Future Work → Appendices. Working title: *Identifiability Geometry of MMD Calibration in Differentiable Agent-Based Models*.
+4. **Real data**: S&P 500 daily returns calibration of Brock-Hommes under deliberate misspecification — *strengthens, not blocking*.
+5. N=50+ multi-seed (Appendix A aspirational target: 240 runs) — *strengthens, not blocking*.
+6. Pearson-normalised spectrum reporting — *strengthens, not blocking* (flag in §5 Limitations if skipped).
 
 **How to apply:** This doc is the canonical "where we are." Update it when the codebase changes. Don't write a new dated status file unless capturing a milestone — keep this current instead.

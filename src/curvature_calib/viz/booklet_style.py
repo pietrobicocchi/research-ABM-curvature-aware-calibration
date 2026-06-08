@@ -18,6 +18,7 @@ __all__ = ["apply_booklet_style", "save_vector", "QUAL", "SEQ", "DIV", "REGIME"]
 
 def apply_booklet_style() -> None:
     plt.rcParams.update({
+        # vector-friendly, higher-DPI, serif: booklet-specific overrides vs style.py
         "figure.facecolor": "white",
         "axes.facecolor": "white",
         "axes.edgecolor": "#2c3e50",
@@ -56,5 +57,5 @@ def save_vector(fig: mpl.figure.Figure, name: str,
     pdf = out_dir / f"{name}.pdf"
     png = out_dir / f"{name}.png"
     fig.savefig(pdf)
-    fig.savefig(png)
+    fig.savefig(png, dpi=300)
     return {"pdf": pdf, "png": png}
