@@ -62,17 +62,22 @@ Mirrors `scripts/viz/_bhdata.py` structure and caching convention.
 
 ### 3. Two new figures (paper_style idiom)
 
-- `scripts/viz/fig7_sir_motion.py` — mirror of fig2: `log10 λ_k(t)` for P=5 eigenvalues with
+- `scripts/viz/fig7_netsir_motion.py` — mirror of fig2: `log10 λ_k(t)` for P=5 eigenvalues with
   bootstrap bands + τ_t accent line, `d_eff(t)` step panel below, 3 R₀ columns, shared axes,
   single-hue rank ramp, direct right-margin line labels.
-- `scripts/viz/fig7b_sir_subspace_rotation.py` — mirror of fig2b: `Θ_k(t)` largest principal
+- `scripts/viz/fig7b_netsir_subspace_rotation.py` — mirror of fig2b: `Θ_k(t)` largest principal
   angle between S_k(0) and S_k(t) for nested k=1..P-1, linear axis in degrees, solid =
   identifiable (k≤d_eff) / dashed-faint = into noise floor, 3 R₀ columns.
-- **Falsification:** regenerate the existing `scripts/viz/fig6_sir_falsification.py`. Verify it
-  uses the interventionist θ\* (fix if it is on the inert-lockdown point); no new script.
+- `scripts/viz/fig7c_netsir_falsification.py` — **new**, mirrors the existing mean-field
+  `fig6_sir_falsification.py` but on `models.network_sir` at the interventionist network θ\*.
+  (The existing fig6 is mean-field SIR; the user's intent is network-SIR for all three
+  experiments, so this is a new script, not a fig6 reuse.) 2×3 grid: rows stiff v₁ / sloppy v_P,
+  columns moments / ACF / tail quantiles, discrepancy vs signed step α. Trimmed batch
+  (N_BATCH=4, 9 α values, M=48) for network cost.
 
-Outputs: `outputs/viz/fig7_sir_motion.{pdf,png}`, `fig7b_sir_subspace_rotation.{pdf,png}`,
-refreshed `fig6_sir_falsification.{pdf,png}`.
+Naming uses the `netsir` prefix to keep the model explicit vs mean-field fig6.
+Outputs: `outputs/viz/fig7_netsir_motion.{pdf,png}`, `fig7b_netsir_subspace_rotation.{pdf,png}`,
+`fig7c_netsir_falsification.{pdf,png}`.
 
 ### 4. Structured MD log — `outputs/viz/SIR_DIAGNOSTIC_LOG.md`
 
@@ -83,7 +88,7 @@ refreshed `fig6_sir_falsification.{pdf,png}`.
 - (ii) The 3 R₀ operating points (θ\* table, R₀ derivation).
 - (iii) Each experiment — motion, subspace rotation, falsification — figure reference + key
   numbers (spectrum span OOM, d_eff per regime, Θ_k drift, falsification stiff/sloppy ratios)
-  + one-line finding each.
+  + one-line finding each. All three experiments are on network-SIR.
 - (iv) Pointer to the ARNAU memory doc + one paragraph relating this suite to the paper's
   first-order sensitivity analysis (we add the second-moment / identifiability view).
 
@@ -100,4 +105,4 @@ refreshed `fig6_sir_falsification.{pdf,png}`.
 - Network-SIR calibration cost even trimmed; smoke run gates the full run.
 - Stiff δ must be validated empirically — a random/sloppy init leaves the optimiser at the MMD
   noise floor with no signal (same failure mode documented for BH in state.md).
-- fig6 may currently sit on the inert-lockdown θ\*; check before quoting its numbers in the log.
+- Network falsification cost: trimmed batch (N_BATCH=4, 9 α, M=48) keeps it to a few minutes.
