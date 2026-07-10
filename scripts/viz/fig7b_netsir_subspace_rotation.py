@@ -55,7 +55,19 @@ for c, regime in enumerate(_netsirdata.REGIME_ORDER):
                 lw=1.2 if identified else 1.0,
                 alpha=1.0 if identified else 0.5,
                 ls="-" if identified else (0, (3, 2)), zorder=3)
-        ax.text(it[-1] + 0.8, series[regime][k][-1], rf"$k={k}$",
+    # right-margin k labels, nudged apart in linear space so curves that
+    # converge to nearly the same angle keep legible, separated labels
+    ys = np.array([series[regime][k][-1] for k in KS], float)
+    order = np.argsort(-ys)
+    y_lab = ys.copy()
+    min_gap = 0.05 * ymax
+    for rank in range(1, len(KS)):
+        cur, prev = order[rank], order[rank - 1]
+        if y_lab[prev] - y_lab[cur] < min_gap:
+            y_lab[cur] = y_lab[prev] - min_gap
+    for i, k in enumerate(KS):
+        identified = k <= deff
+        ax.text(it[-1] + 0.8, y_lab[i], rf"$k={k}$",
                 color=colors[i], fontsize=7, va="center", ha="left",
                 alpha=1.0 if identified else 0.55, clip_on=False)
     ax.set_ylim(-2, ymax * 1.05)
