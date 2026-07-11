@@ -2,7 +2,8 @@
 title: EXP-001 Review — Analytic linear GGN recovery
 status: complete
 date: 2026-07-11
-base_commit: e1b3a6f (working tree dirty; see provenance)
+authoritative_commit: 7c612df (clean working tree; dirty=false)
+baseline_commit: e1a7dc9 (repo reset + vault); prior HEAD e1b3a6f
 plan: EXP001_IMPLEMENTATION_PLAN.md (approved-with-revisions)
 result: PASS
 supports: C01 (linear/affine scope)
@@ -12,6 +13,33 @@ supports: C01 (linear/affine scope)
 
 Implementation of EXP-001 (analytic linear GGN recovery) plus the minimum
 reusable GGN infrastructure, executed exactly as revised. **EXP-001 passes.**
+
+## 0. Authoritative clean-commit provenance
+
+The reproducibility loop is closed on a **clean working tree** at commit
+`7c612df` (`feat(geometry): EXP-001 …`, on top of baseline `e1a7dc9`). The
+authoritative runs below were produced with `git status --porcelain` empty, so
+their `provenance.json` records `git_dirty: false` and the exact commit.
+
+| Run | Run ID (authoritative) | commit | dirty |
+|---|---|---|---|
+| float64 validation | `outputs/EXP-001/20260711T172324Z_7c612df/` | 7c612df983…050e5 | **false** |
+| ~1e13 stress | `outputs/EXP-001/20260711T172342Z_7c612df/` | 7c612df983…050e5 | **false** |
+
+Each `provenance.json` records: exact commit hash; `git_dirty: false`; Python
+3.12.13; JAX/jaxlib 0.4.30; numpy 2.4.6; `x64_enabled: true`;
+`default_float_dtype: float64`; `executed_command:
+"uv run python -m experiments.exp001_linear_ggn"` (plus raw `argv`); and the
+full run configuration.
+
+**Historical (superseded, retained) — dirty-tree runs from the initial pass:**
+`outputs/EXP-001/20260711T170640Z_e1b3a6f/` (main) and `…170707Z_e1b3a6f/`
+(stress); those carry `git_dirty: true`. Kept as artifacts; not authoritative.
+
+Clean-run acceptance metrics are **identical** to the historical runs
+(deterministic, seed 0): float64 worst-case `rel_fro(AD GGN, AᵀWA)=0.00e+00`,
+`matvec≤7.65e-16`, `‖R‖/‖G‖=0.00e+00`, eigvec angle `≤4.47e-08`, rank/null-space
+exact (`null angle ≤3.33e-08`), OPG at fit `0.00e+00`, FD best `8.37e-15`.
 
 ## 1. Files changed
 
@@ -57,8 +85,10 @@ Isolation checks run during debugging:
 
 ## 3. Acceptance metrics
 
-From `outputs/EXP-001/20260711T170640Z_e1b3a6f/metrics.json`
-(main, seed 0) and the stress run `…170707Z_e1b3a6f/`.
+From the authoritative clean runs
+`outputs/EXP-001/20260711T172324Z_7c612df/metrics.json` (main, seed 0) and
+`…172342Z_7c612df/` (stress). Values are identical to the historical dirty-tree
+runs (deterministic).
 
 **float64 — ordinary validation grid** `P∈{5,20,100}`, `cond(AᵀA)∈{1,1e2,1e6}`,
 full & rank-deficient, 18 cells; worst-case over cells:
@@ -92,22 +122,32 @@ Best = **8.37e-15 ≤ 1e-5** ✅. The AD `1e-10` bound is not applied to FD.
 only; never defines acceptance.
 
 **Ill-conditioning stress (`~1e13`, non-gating, Decision 1).** P20:
-- float64: `rel_fro_ggn=0.00e+00`, eigvec angle `2.11e-08`, but numerical rank
-  drops to **15/20** — the smallest σ²≈1e-13·λ_max fall below the `rtol=1e-10`
-  rank threshold. Expected, characterizes the sloppy-tail floor, not a failure.
+- float64: `rel_fro_ggn=0.00e+00`, eigvec angle `2.11e-08`; the **numerical rank
+  under the stated tolerance** (`rtol=1e-10`) is **15/20**, because the smallest
+  σ²≈1e-13·λ_max fall below that threshold. This reflects the numerical
+  tolerance, not a change in the mathematical rank of `AᵀWA`; it characterizes
+  the sloppy-tail floor and is expected, not a failure.
 - float32: eigvec angle `3.45e-04`; FD best `1.74e-06` vs float64 `6.83e-15` —
   the precision/conditioning degradation the CLAUDE.md invariant warns about.
 
 ## 4. Provenance path
 
-- Main run: `outputs/EXP-001/20260711T170640Z_e1b3a6f/`
+**Authoritative (clean tree, commit `7c612df`, `dirty:false`):**
+- Main run: `outputs/EXP-001/20260711T172324Z_7c612df/`
   (`config.json`, `provenance.json`, `metrics.json`, `arrays.npz`,
   `figures/fig01_linear_benchmark.{png,pdf}`).
-- Stress run: `outputs/EXP-001/20260711T170707Z_e1b3a6f/`.
+- Stress run: `outputs/EXP-001/20260711T172342Z_7c612df/`.
 
-`provenance.json` records git commit `e1b3a6fa…` (dirty=true), jax/jaxlib 0.4.30,
-numpy 2.4.6, python 3.12.13, `x64_enabled=true`, `default_float_dtype=float64`,
-seeds, and the full config. Nothing was written to `docs/` or the Results Ledger.
+**Historical (dirty tree, retained, not authoritative):**
+- `outputs/EXP-001/20260711T170640Z_e1b3a6f/` (main),
+  `…170707Z_e1b3a6f/` (stress), both `dirty:true`.
+
+The authoritative `provenance.json` records git commit
+`7c612df983feb7970bda7efc64456e59f01050e5`, `git_dirty:false`, jax/jaxlib 0.4.30,
+numpy 2.4.6, python 3.12.13, `x64_enabled:true`, `default_float_dtype:float64`,
+`executed_command:"uv run python -m experiments.exp001_linear_ggn"`, `argv`,
+seeds, and the full config. `outputs/` is gitignored; nothing was written to
+`docs/` or the Results Ledger.
 
 ## 5. Deviations from the plan
 
