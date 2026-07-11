@@ -1,8 +1,7 @@
-"""Per-seed gradients and the outer-product-of-gradients (OPG) matrix.
+"""Per-seed scalar-loss gradients and their uncentered second moment (F_OPG).
 
-The MMD^2 loss is a U-statistic that couples samples; the natural "per-seed
-gradient" is the contribution to nabla_theta MMD^2 from one simulator seed via
-the chain rule
+The MMD^2 loss is a U-statistic that couples samples; the "per-seed gradient" is
+the contribution to nabla_theta MMD^2 from one simulator seed via the chain rule
 
     g_m = M * (dMMD^2 / dx_m) . (dx_m / dtheta)
 
@@ -11,16 +10,17 @@ total gradient,
 
     mean_g = (1/M) sum_m g_m = nabla_theta MMD^2.
 
-This matches the convention in the project plan (section 3 of the writeup) and
-makes the OPG matrix
+From these the module forms the **uncentered second moment**
 
-    F_hat = (1/M) sum_m g_m g_m^T
+    F_OPG = (1/M) sum_m g_m g_m^T.
 
-interpretable as a stochastic generalised Gauss-Newton (GGN) approximation
-of the MMD^2 Hessian via the residual structure of MMD.
-
-NOTE: F_hat is the *empirical curvature / OPG matrix*, NOT the Fisher
-information. See docs/memory/framing_kunstner_opg_not_fisher.md.
+IMPORTANT (DEC-001, Math-Spec §14): F_OPG is a *labeled comparison object*, NOT
+the generalized Gauss–Newton matrix, Fisher information, Hessian, or a
+curvature/identifiability matrix. For a residual loss g = J^T r, so
+g g^T = J^T r r^T J != J^T J, and at an exact fit g = 0 while the true GGN
+J^T J != 0. The true MMD GGN is J_eta^T J_eta (see geometry.rff / geometry.ggn).
+The centered covariance C_g is available via
+diagnostic.scalar_gradient_covariance.
 """
 
 from __future__ import annotations
@@ -37,7 +37,9 @@ class CalibStats(NamedTuple):
     loss: jax.Array            # scalar, unbiased MMD^2
     mean_grad: jax.Array       # (P,) mean per-seed gradient = nabla_theta MMD^2
     per_seed_grads: jax.Array  # (M, P)
-    opg: jax.Array             # (P, P), (1/M) sum_m g_m g_m^T
+    # (P, P) F_OPG = (1/M) sum_m g_m g_m^T: uncentered second moment of per-seed
+    # scalar-loss gradients. NOT the GGN/Fisher/Hessian/curvature (DEC-001).
+    opg: jax.Array
 
 
 def vmap_simulate(simulate_fn: Callable, theta: jax.Array, keys: jax.Array) -> jax.Array:
@@ -78,7 +80,7 @@ def per_seed_loss_and_grads(
     per_seed = jax.vmap(one_seed_grad)(keys, dL_dX)  # (M, P)
 
     mean_grad = jnp.mean(per_seed, axis=0)            # (P,)
-    opg = (per_seed.T @ per_seed) / M                  # (P, P)
+    opg = (per_seed.T @ per_seed) / M                  # F_OPG (comparison object)
     return CalibStats(loss=L, mean_grad=mean_grad,
                       per_seed_grads=per_seed, opg=opg)
 

@@ -1,7 +1,9 @@
-"""Eigenanalysis of the OPG matrix: spectrum, eigenvectors, effective dimension.
+"""Eigenanalysis utilities for symmetric matrices: spectrum, eigenvectors,
+effective dimension, principal angles.
 
-Pure mathematical layer. Bootstrap confidence intervals live in bootstrap.py.
-Throughout, eigenvalues are returned in descending order.
+Pure mathematical layer, agnostic to which matrix it is handed. Bootstrap
+confidence intervals live in bootstrap.py. Throughout, eigenvalues are returned
+in descending order.
 """
 from __future__ import annotations
 
@@ -24,10 +26,33 @@ def eigendecompose(F: jax.Array) -> EigDecomp:
     return EigDecomp(eigvals=w[order], eigvecs=V[:, order])
 
 
-def opg_from_grads(per_seed_grads: jax.Array) -> jax.Array:
-    """F_hat = (1/M) G^T G where G has shape (M, P)."""
+def scalar_gradient_opg(per_seed_grads: jax.Array) -> jax.Array:
+    """F_OPG = (1/M) Σ_m g_m g_mᵀ = (1/M) GᵀG, G shape (M, P).
+
+    The **uncentered second moment** of per-seed *scalar-loss* gradient
+    contributions g_m (rows of G). This is NOT the generalized Gauss–Newton
+    matrix, Fisher information, Hessian, or a curvature/identifiability matrix
+    in general (DEC-001, Math-Spec §14): for a residual loss g = Jᵀr, so
+    g gᵀ = Jᵀ r rᵀ J ≠ JᵀJ, and at an exact fit g = 0 while the GGN JᵀJ ≠ 0.
+    It is retained only as a labeled comparison object.
+    """
     M = per_seed_grads.shape[0]
     return (per_seed_grads.T @ per_seed_grads) / M
+
+
+def scalar_gradient_covariance(per_seed_grads: jax.Array) -> jax.Array:
+    """C_g = (1/M) Σ_m (g_m − ḡ)(g_m − ḡ)ᵀ, the **centered** covariance of the
+    per-seed scalar-loss gradients. Related to the uncentered second moment by
+    F_OPG = C_g + ḡ ḡᵀ. Also NOT the GGN.
+    """
+    M = per_seed_grads.shape[0]
+    centered = per_seed_grads - jnp.mean(per_seed_grads, axis=0, keepdims=True)
+    return (centered.T @ centered) / M
+
+
+# Deprecated alias — prefer scalar_gradient_opg. Retained for backward
+# compatibility; the numerical object is unchanged.
+opg_from_grads = scalar_gradient_opg
 
 
 def principal_angles(V1: jax.Array, V2: jax.Array) -> jax.Array:
