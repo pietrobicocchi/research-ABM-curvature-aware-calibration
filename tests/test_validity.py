@@ -77,6 +77,31 @@ def test_irr_prediction_biased_by_residual_curvature():
     assert rad["rho"] < _ALPHA_MAX
 
 
+def test_curvature_bias_zero_at_exact_fit_and_matches_alpha0_error():
+    """e_curv = 0 for Case A (R=0 at optimum); for Case B it is nonzero and
+    approximates the α→0 quadratic-prediction relative error (residual bias)."""
+    # Case A: exact fit ⇒ e_curv ≈ 0 along every eigenvector.
+    ma = nr.RosenbrockResidual(a=5.0, b=1.0)
+    la, ra = nr.rosen_loss_fn(ma), nr.rosen_residual_fn(ma)
+    zo = nr.rosen_optimum(ma)
+    Ha, Ga = G.exact_hessian(la, zo), G.ggn_dense(ra, zo)
+    ea = eigendecompose(Ga)
+    for k in range(2):
+        assert V.curvature_bias(Ha, Ga, ea.eigvecs[:, k]) <= 1e-8
+
+    # Case B: nonzero bias ~ constant α→0 prediction error.
+    mb = nr.IrreducibleResidual(lam=0.3, c=0.0)
+    lb, rb = nr.irr_loss_fn(mb), nr.irr_residual_fn(mb)
+    zb = nr.newton_minimize(lb, jnp.array([1.0, 1.0]))
+    Hb, Gb = G.exact_hessian(lb, zb), G.ggn_dense(rb, zb)
+    eb = eigendecompose(Gb)
+    v, lam = eb.eigvecs[:, 0], float(eb.eigvals[0])
+    e_curv = V.curvature_bias(Hb, Gb, v)
+    err_small = float(V.quadratic_model_error(lb, zb, v, lam, jnp.array([1e-3]))[0])
+    assert e_curv > 1e-2
+    assert abs(e_curv - err_small) <= 1e-2  # bias persists as alpha -> 0
+
+
 def test_validity_radius_inputs_not_mutated():
     model = nr.RosenbrockResidual(a=5.0, b=1.0)
     loss = nr.rosen_loss_fn(model)

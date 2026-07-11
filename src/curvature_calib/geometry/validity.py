@@ -21,6 +21,21 @@ Array = jax.Array
 _EPS = 1e-300
 
 
+def curvature_bias(H: Array, G: Array, v: Array) -> float:
+    """Infinitesimal GGN curvature bias along direction v (Math-Spec §7):
+
+        e_curv(v) = |vᵀ(H − G)v| / max(|vᵀHv|, ε).
+
+    This is the residual-curvature bias that can remain NONZERO as α→0 — a
+    distinct failure mode from the nonlinear validity radius (which measures the
+    additional breakdown as the perturbation grows). Reusable across experiments.
+    """
+    vn = v / jnp.linalg.norm(v)
+    num = jnp.abs(vn @ (H - G) @ vn)
+    den = jnp.maximum(jnp.abs(vn @ H @ vn), _EPS)
+    return float(num / den)
+
+
 def directional_loss_change(loss_fn: Callable[[Array], Array], z_hat: Array,
                             direction: Array, alphas: Array) -> Array:
     """ΔL(α) = L(ẑ + α·d̂) − L(ẑ) over the α-grid. d is normalized. Shape (len(A),)."""
