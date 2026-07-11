@@ -4,6 +4,16 @@ Research code for the paper *"Curvature-Aware Calibration of Differentiable Agen
 
 The central contribution is a **diagnostic** to investigate identifiability in differentiable ABMs. 
 
+## Status
+
+**Phase 2: nonlinear GGN validity and residual-curvature analysis.**
+
+EXP-001 (analytic linear GGN recovery) is accepted; C01 is supported for affine
+finite-dimensional benchmarks in float64 (see `docs/05_RESULTS_LEDGER.md`
+RES-001, commit `7c612df`). **Immediate next action: EXP-002** — nonlinear
+`∇²L = G + R` validity and the empirical validity radius
+(`inbox/EXP002_IMPLEMENTATION_PLAN.md`).
+
 ## Setup
 
 Requires Python 3.12 and [uv](https://github.com/astral-sh/uv).

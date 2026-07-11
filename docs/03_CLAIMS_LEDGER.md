@@ -10,7 +10,7 @@ Only claims marked **supported** or **supported conditionally** may enter the ab
 
 | ID | Proposed claim | Status | Required support | Current evidence | Intended location |
 |---|---|---|---|---|---|
-| C01 | AD reproduces analytic GGN matrices on controlled models. | proposed | EXP-001 | none | Methods / Validation |
+| C01 | The implemented AD construction reproduces the analytic generalized Gauss–Newton matrix on affine finite-dimensional benchmarks in float64. | supported | EXP-001 | RES-001 (commit 7c612df) | Methods / Validation |
 | C02 | The GGN is positive semidefinite and measures first-order change in the calibrated representation. | supported | algebraic derivation | Mathematical Specification | Theory |
 | C03 | The GGN approximates the exact Hessian near a good fit. | proposed | EXP-002, EXP-005 | theoretical condition only | Theory / Results |
 | C04 | The MMD GGN can be estimated consistently from simulator feature Jacobians. | proposed | EXP-003 | derivation only | Methods |
@@ -30,6 +30,15 @@ Only claims marked **supported** or **supported conditionally** may enter the ab
 | C18 | Posterior curvature can be interpreted as data information without separating the prior. | rejected | false by decomposition | Mathematical Specification | nowhere |
 | C19 | MMD is the only common calibration loss admitting a GGN. | rejected | GGN applies more broadly | standard composite-loss theory | nowhere |
 | C20 | The proposed method is a local diagnostic relevant to practical non-identifiability, not a complete global test. | supported conditionally | conceptual analysis | Mathematical Specification | Introduction / Discussion |
+
+## Scope note on C01
+
+C01 is supported **only** for affine finite-dimensional representations in
+float64 (EXP-001). It does **not** yet establish correctness of the AD GGN
+construction for: nonlinear representations, stochastic simulators, the MMD
+GGN, surrogate/relaxed gradients, or the Brock–Hommes and SIR models. Those
+require EXP-002 (nonlinear), EXP-003 (MMD), EXP-004/005 (BH/SIR), and EXP-008
+(surrogate/stochastic) respectively.
 
 ## Claim review template
 
