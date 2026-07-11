@@ -6,13 +6,13 @@ The central contribution is a **diagnostic** to investigate identifiability in d
 
 ## Status
 
-**Phase 2: nonlinear GGN validity and residual-curvature analysis.**
+**Phase 3: stochastic MMD GGN estimation.**
 
-EXP-001 (analytic linear GGN recovery) is accepted; C01 is supported for affine
-finite-dimensional benchmarks in float64 (see `docs/05_RESULTS_LEDGER.md`
-RES-001, commit `7c612df`). **Immediate next action: EXP-002** — nonlinear
-`∇²L = G + R` validity and the empirical validity radius
-(`inbox/EXP002_IMPLEMENTATION_PLAN.md`).
+EXP-001 (analytic linear GGN recovery, C01) and EXP-002 (nonlinear `∇²L=G+R`
+validity, C03/C09 conditional) are accepted (see `docs/05_RESULTS_LEDGER.md`
+RES-001/RES-002). **Immediate next experiment: EXP-003** — estimators of the MMD
+GGN `Gₘₘ_d = Jμᵀ Jμ` for a controlled stochastic simulator
+(`inbox/EXP003_IMPLEMENTATION_PLAN.md`).
 
 ## Setup
 

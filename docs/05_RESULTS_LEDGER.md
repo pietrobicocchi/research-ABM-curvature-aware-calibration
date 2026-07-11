@@ -93,6 +93,64 @@ Run EXP-002.
 
 ---
 
+## RES-002 — EXP-002 nonlinear local-validity benchmark
+
+- **Status:** reviewed
+- **Experiment ID:** EXP-002
+- **Authoritative commits:** code `4118f4e`, review `0d1eb4b` (clean tree)
+- **Environment:** Python 3.12.13, JAX/jaxlib 0.4.30, float64
+- **Run ID:** `outputs/EXP-002/20260711T175059Z_4118f4e/`
+- **Tests:** `166 passed` (`uv run pytest`).
+
+### Benchmarks
+
+- **Case A — Rosenbrock exact-fit valley:** `r=[a(z2−z1²), b(1−z1)]`,
+  optimum `(1,1)`, `R=0` there; `a∈{1,5,10}`, `b=1`.
+- **Case B — irreducible residual:** `r=[z1−1, z2−1, λ(z1²+z2²−c)]`,
+  analytic `R=2λ·r3·I`; `(λ,c)∈{(0.3,0.0),(1.0,4.0)}`.
+
+### Observation
+
+- **Minimizer checks:** Case A `‖∇L‖=0`; Case B Newton `‖∇L‖≤1.4e-15`.
+- **R_AD vs analytic R:** `rel_fro ≤ 3.2e-15` (all cells); `G_AD`/`H_AD` vs
+  analytic `≤1.6e-16`. The decomposition `H=G+R` is numerically exact.
+- **Case A validity radii (τ=10%, prespecified signed α-grid):**
+  `a=1 → {v0:0.1, v1:0.3}`, `a=5 → {0.1,0.1}`, `a=10 → {0.1,0.05}` — nontrivial,
+  local, direction-dependent; shrinks as the valley sharpens.
+- **Case B residual-curvature magnitude at the minimizer:**
+  `‖R‖/‖H‖ = 0.158` (λ=0.3) and `0.025` (λ=1,c=4); eigenvalue rel error up to
+  `0.39` while the leading-eigenvector angle stays `≤2.1e-08`.
+- **Zero GGN validity radius (Case B):** under the prespecified 10% tolerance the
+  radius is `0` for the biased directions (`λ=0.3 → {0,0}`, `λ=1 → {0.1, 0}`),
+  because the residual-curvature bias `≈ vᵀRv/vᵀHv` is roughly constant in α and
+  exceeds τ — an irreducible bias that persists as `α→0`.
+
+### Two failure modes (main scientific result)
+
+1. **residual-curvature bias** — nonzero as `α→0`
+   (`e_curv(v)=|vᵀ(H−G)v|/max(|vᵀHv|,ε)`);
+2. **higher-order nonlinear error** — grows with perturbation radius (validity
+   radius).
+
+### Supports
+
+- C03 — supported conditionally (numerically exact H=G+R; GGN predicts near
+  exact/low-residual fits; irreducible bias when R non-negligible).
+- C09 — supported conditionally (nontrivial radius near good fits; collapses
+  under residual-curvature bias).
+
+### Does not establish
+
+- correctness for stochastic simulators or the MMD GGN (EXP-003);
+- Brock–Hommes or SIR geometry (EXP-004/005);
+- any unconditional/global validity claim.
+
+### Follow-up
+
+Run EXP-003.
+
+---
+
 # Result entry template
 
 ## RES-XXX — Experiment and result title

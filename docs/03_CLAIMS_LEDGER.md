@@ -12,13 +12,13 @@ Only claims marked **supported** or **supported conditionally** may enter the ab
 |---|---|---|---|---|---|
 | C01 | The implemented AD construction reproduces the analytic generalized Gauss–Newton matrix on affine finite-dimensional benchmarks in float64. | supported | EXP-001 | RES-001 (commit 7c612df) | Methods / Validation |
 | C02 | The GGN is positive semidefinite and measures first-order change in the calibrated representation. | supported | algebraic derivation | Mathematical Specification | Theory |
-| C03 | The GGN approximates the exact Hessian near a good fit. | proposed | EXP-002, EXP-005 | theoretical condition only | Theory / Results |
+| C03 | On controlled nonlinear residual problems the implemented decomposition H=G+R is numerically exact, and the GGN predicts local loss geometry near exact or low-residual fits; non-negligible residual curvature causes an irreducible local prediction bias even arbitrarily close to a stationary point. | supported conditionally | EXP-002 (+EXP-005) | RES-002 (commit 4118f4e) | Theory / Results |
 | C04 | The MMD GGN can be estimated consistently from simulator feature Jacobians. | proposed | EXP-003 | derivation only | Methods |
 | C05 | The PSD plug-in MMD estimator has acceptable finite-sample bias. | proposed | EXP-003 | none | Results |
 | C06 | The cross-seed MMD estimator has lower bias but may be indefinite at finite sample size. | proposed | EXP-003 | derivation only | Results |
 | C07 | Raw per-seed scalar-loss OPG estimates the GGN. | rejected | contradicted algebraically | scalar and residual counterexamples | nowhere |
 | C08 | The old OPG eigenspaces align with the true GGN on Brock--Hommes. | proposed | EXP-000 | none | Comparison / Appendix |
-| C09 | The local GGN predicts actual loss changes over a nontrivial radius. | proposed | EXP-002, EXP-004, EXP-005 | none | Results |
+| C09 | The local GGN predicts actual loss changes over a nontrivial radius near exact or low-residual fits; the validity radius shrinks with curvature and collapses under non-negligible residual-curvature bias. | supported conditionally | EXP-002 (+EXP-004, EXP-005) | RES-002 (commit 4118f4e) | Results |
 | C10 | Prior-relative GGN directions agree with local posterior contours in smooth SIR. | proposed | EXP-005 | none | Results |
 | C11 | Weak prior-relative SIR directions agree with profiled generalized-posterior energy. | proposed | EXP-005 | none | Results |
 | C12 | A locally weak SIR direction materially changes a policy quantity. | proposed | EXP-006 | old OPG evidence is not sufficient | Results |
@@ -39,6 +39,17 @@ construction for: nonlinear representations, stochastic simulators, the MMD
 GGN, surrogate/relaxed gradients, or the Brock–Hommes and SIR models. Those
 require EXP-002 (nonlinear), EXP-003 (MMD), EXP-004/005 (BH/SIR), and EXP-008
 (surrogate/stochastic) respectively.
+
+## Scope note on C03 and C09
+
+C03 and C09 are supported conditionally **only** on the deterministic controlled
+nonlinear residual benchmarks of EXP-002 (float64). They have **not** been
+established for stochastic simulators, the MMD GGN, or the Brock–Hommes and SIR
+models; those require EXP-003 (MMD) and EXP-004/005 (BH/SIR). EXP-002 also fixes
+the vocabulary for two failure modes: (i) **residual-curvature bias**, nonzero as
+`α→0`, quantified by `e_curv(v)=|vᵀ(H−G)v| / max(|vᵀHv|, ε)`; and (ii)
+**higher-order nonlinear error**, which grows with the perturbation radius and is
+captured by the validity radius.
 
 ## Claim review template
 
