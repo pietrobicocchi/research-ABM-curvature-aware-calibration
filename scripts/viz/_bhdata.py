@@ -57,7 +57,8 @@ def _run_regime(theta_star, name):
                     init_damping=100.0, verbose=False, seed_base=REGIME_SEEDS[name])
 
     eigvals_traj = np.asarray(log.eigvals)              # (n_iter, P)
-    V_T = np.asarray(log.eigvecs[-1])                   # (P, P)
+    eigvecs_traj = np.asarray(log.eigvecs)              # (n_iter, P, P)
+    V_T = eigvecs_traj[-1]                               # (P, P)
     psg = np.asarray(log.per_seed_grads)               # (n_iter, M, P)
 
     n_iter = eigvals_traj.shape[0]
@@ -77,8 +78,9 @@ def _run_regime(theta_star, name):
         # identified := bootstrap CI lower bound clears the precision floor
         d_eff[t] = int(np.sum(boot_lo[t] > pfloor[t]))
 
-    return dict(eigvals_traj=eigvals_traj, V_T=V_T, tau=pfloor, d_eff=d_eff,
-                boot_lo=boot_lo, boot_hi=boot_hi, eigvals_T=eigvals_traj[-1])
+    return dict(eigvals_traj=eigvals_traj, eigvecs_traj=eigvecs_traj, V_T=V_T,
+                tau=pfloor, d_eff=d_eff, boot_lo=boot_lo, boot_hi=boot_hi,
+                eigvals_T=eigvals_traj[-1])
 
 
 def load(force: bool = False) -> dict:
@@ -89,7 +91,11 @@ def load(force: bool = False) -> dict:
         for name in REGIME_ORDER:
             out[name] = {k[len(name) + 1:]: raw[k] for k in raw.files
                          if k.startswith(name + "_")}
-        return out
+        # stale-cache guard: pre-2026-06-23 caches lack the per-iterate
+        # eigenvector trajectory needed for the subspace-rotation figure.
+        if all("eigvecs_traj" in out[name] for name in REGIME_ORDER):
+            return out
+        print("  cache missing eigvecs_traj -> recomputing ...", flush=True)
 
     results = {}
     for name in REGIME_ORDER:
