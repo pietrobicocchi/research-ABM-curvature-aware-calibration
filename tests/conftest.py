@@ -15,6 +15,8 @@ _X64_MODULES = {
     "test_metrics",
     "test_linear_gaussian",
     "test_ggn",
+    "test_nonlinear_residual",
+    "test_validity",
 }
 
 
