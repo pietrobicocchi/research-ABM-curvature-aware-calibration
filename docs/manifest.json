@@ -1,0 +1,19 @@
+{
+  "project": "Local Information Geometry of Differentiable ABMs",
+  "created": "2026-07-11",
+  "files": [
+    "01_PROJECT_CHARTER.md",
+    "02_MATHEMATICAL_SPECIFICATION.md",
+    "03_CLAIMS_LEDGER.md",
+    "04_EXPERIMENT_REGISTRY.md",
+    "05_RESULTS_LEDGER.md",
+    "06_LITERATURE_MAP.md",
+    "07_DECISION_LOG.md",
+    "08_PAPER_ARCHITECTURE.md",
+    "README.md",
+    "archive/README.md",
+    "experiments/README.md",
+    "meetings/README.md",
+    "models/README.md"
+  ]
+}
