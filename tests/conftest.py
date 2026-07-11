@@ -17,6 +17,8 @@ _X64_MODULES = {
     "test_ggn",
     "test_nonlinear_residual",
     "test_validity",
+    "test_rff",
+    "test_mmd_estimators",
 }
 
 
