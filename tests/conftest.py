@@ -19,6 +19,7 @@ _X64_MODULES = {
     "test_validity",
     "test_rff",
     "test_mmd_estimators",
+    "test_exp000_bh_audit",
 }
 
 
