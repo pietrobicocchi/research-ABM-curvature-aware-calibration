@@ -151,6 +151,52 @@ Run EXP-003.
 
 ---
 
+## RES-003 — EXP-003 stochastic MMD GGN estimation
+
+- **Status:** reviewed
+- **Experiment ID:** EXP-003
+- **Authoritative commit:** `ce45c43` (clean tree, `git_dirty: false`)
+- **Environment:** Python 3.12.13, JAX/jaxlib 0.4.30, float64
+- **Run ID:** `outputs/EXP-003/20260711T215027Z_ce45c43/`
+- **Tests:** `181 passed`.
+
+### Benchmark
+
+Gaussian location-scale `X_z=a(z)+L(z)ε` (prior-scaled `z`, P=5), frozen RFF
+(γ=2, D=512). Main regime `G_ref` eigenvalues `[0.116,0.112,0.0074,0.0036,0.0018]`
+(gap λ2/λ3≈15); near-degenerate `[0.082,0.041,0.029,0.028,0.020]` (λ2/λ3≈1.4).
+
+### Observation
+
+- **Analytic reference validated:** closed-form feature mean `η` vs MC
+  `rel_fro=2.4e-3` (MC floor); `J_η` vs central finite differences `3.9e-11`;
+  finite-D `G_ref → G_RBF` (exact RBF kernel) `0.084→0.028` over D∈{64,256,1024}.
+- **Plug-in bias (C05):** relative bias `0.187→0.011` for M=8→256; predicted
+  `Ĉ/M` lies inside the observed 95% CI for M∈{8..128}; at M=256 the true bias is
+  below the B=200 sampling floor (a resolution limit, not a model failure).
+- **Cross-seed (C06):** bias compatible with zero at all M; negative-eigenvalue
+  frequency `0.94→0.28→0` (M=8→32+) in both regimes.
+- **Top-two subspace recovery (C04):** angle ≤5° for M≥16 (main and
+  near-degenerate); A3 passes at M∈{16,32,64,128,256}.
+- **OPG residual sweep:** `F_OPG_pop=0` at exact match (δ=0) while `G_ref≠0`;
+  for δ>0 the OPG is residual-dependent and shape-distinct (trace-normalized
+  `rel_fro≈0.94`) — confirms OPG ≠ GGN (DEC-001).
+
+### Supports
+
+- C04, C05, C06 — supported conditionally.
+
+### Does not establish
+
+- Brock–Hommes, SIR; production MMD code; arbitrary kernels/representations;
+  surrogate gradients; discrete stochastic ABMs; posterior geometry.
+
+### Follow-up
+
+Run EXP-000 (Brock–Hommes historical-OPG audit).
+
+---
+
 # Result entry template
 
 ## RES-XXX — Experiment and result title

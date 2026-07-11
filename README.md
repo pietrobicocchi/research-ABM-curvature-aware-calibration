@@ -6,13 +6,14 @@ The central contribution is a **diagnostic** to investigate identifiability in d
 
 ## Status
 
-**Phase 3: stochastic MMD GGN estimation.**
+**Phase 4: Brock–Hommes audit — historical OPG versus true MMD GGN.**
 
-EXP-001 (analytic linear GGN recovery, C01) and EXP-002 (nonlinear `∇²L=G+R`
-validity, C03/C09 conditional) are accepted (see `docs/05_RESULTS_LEDGER.md`
-RES-001/RES-002). **Immediate next experiment: EXP-003** — estimators of the MMD
-GGN `Gₘₘ_d = Jμᵀ Jμ` for a controlled stochastic simulator
-(`inbox/EXP003_IMPLEMENTATION_PLAN.md`).
+EXP-001 (linear GGN, C01), EXP-002 (nonlinear `∇²L=G+R`, C03/C09), and EXP-003
+(stochastic MMD GGN estimation, C04/C05/C06) are accepted — all conditional (see
+`docs/05_RESULTS_LEDGER.md` RES-001/002/003). **Immediate next experiment:
+EXP-000** — audit what the historical Brock–Hommes OPG actually measured by
+comparing `H`, `G_MMD`, `F_OPG`, and `C_g` at matched points
+(`inbox/EXP000_IMPLEMENTATION_PLAN.md`).
 
 ## Setup
 

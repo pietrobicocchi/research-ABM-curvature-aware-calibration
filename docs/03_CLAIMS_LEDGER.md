@@ -13,9 +13,9 @@ Only claims marked **supported** or **supported conditionally** may enter the ab
 | C01 | The implemented AD construction reproduces the analytic generalized Gauss–Newton matrix on affine finite-dimensional benchmarks in float64. | supported | EXP-001 | RES-001 (commit 7c612df) | Methods / Validation |
 | C02 | The GGN is positive semidefinite and measures first-order change in the calibrated representation. | supported | algebraic derivation | Mathematical Specification | Theory |
 | C03 | On controlled nonlinear residual problems the implemented decomposition H=G+R is numerically exact, and the GGN predicts local loss geometry near exact or low-residual fits; non-negligible residual curvature causes an irreducible local prediction bias even arbitrarily close to a stationary point. | supported conditionally | EXP-002 (+EXP-005) | RES-002 (commit 4118f4e) | Theory / Results |
-| C04 | The MMD GGN can be estimated consistently from simulator feature Jacobians. | proposed | EXP-003 | derivation only | Methods |
-| C05 | The PSD plug-in MMD estimator has acceptable finite-sample bias. | proposed | EXP-003 | none | Results |
-| C06 | The cross-seed MMD estimator has lower bias but may be indefinite at finite sample size. | proposed | EXP-003 | derivation only | Results |
+| C04 | On the controlled Gaussian location–scale simulator with frozen finite RFF (float64), the MMD GGN is estimated consistently from simulator feature Jacobians. | supported conditionally | EXP-003 | RES-003 (commit ce45c43) | Methods |
+| C05 | The PSD plug-in MMD estimator exhibits the predicted PSD O(1/M) finite-sample bias. | supported conditionally | EXP-003 | RES-003 (commit ce45c43) | Results |
+| C06 | The cross-seed MMD estimator is unbiased within Monte-Carlo resolution but may be indefinite at small sample sizes. | supported conditionally | EXP-003 | RES-003 (commit ce45c43) | Results |
 | C07 | Raw per-seed scalar-loss OPG estimates the GGN. | rejected | contradicted algebraically | scalar and residual counterexamples | nowhere |
 | C08 | The old OPG eigenspaces align with the true GGN on Brock--Hommes. | proposed | EXP-000 | none | Comparison / Appendix |
 | C09 | The local GGN predicts actual loss changes over a nontrivial radius near exact or low-residual fits; the validity radius shrinks with curvature and collapses under non-negligible residual-curvature bias. | supported conditionally | EXP-002 (+EXP-004, EXP-005) | RES-002 (commit 4118f4e) | Results |
@@ -39,6 +39,17 @@ construction for: nonlinear representations, stochastic simulators, the MMD
 GGN, surrogate/relaxed gradients, or the Brock–Hommes and SIR models. Those
 require EXP-002 (nonlinear), EXP-003 (MMD), EXP-004/005 (BH/SIR), and EXP-008
 (surrogate/stochastic) respectively.
+
+## Scope note on C04, C05, and C06
+
+On the controlled Gaussian location–scale simulator with frozen finite random
+Fourier features in float64 (EXP-003), the MMD generalized Gauss–Newton matrix
+can be estimated consistently from simulator feature Jacobians. The PSD plug-in
+estimator exhibits the predicted positive-semidefinite `O(1/M)` bias, while the
+cross-seed estimator is unbiased within Monte-Carlo resolution but may be
+indefinite at small sample sizes. This is **not** yet established for:
+Brock–Hommes; SIR; the production MMD code; arbitrary kernels or representations;
+surrogate gradients; discrete stochastic ABMs; or posterior geometry.
 
 ## Scope note on C03 and C09
 
