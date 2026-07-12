@@ -13,8 +13,20 @@ Dynamics (R = gross risk-free rate, sigma = noise scale):
     x_t        = (1/R) sum_h n_{h,t} (g_h x_{t-1} + b_h) + eps_t
     U_{h,t}    = (x_t - R x_{t-1}) (g_h x_{t-2} + b_h - R x_{t-1})
 
+Dynamical regime (IMPORTANT): `beta` (intensity of choice) is the bifurcation
+parameter. Small beta (order 1-5) sits in the trivial near-fundamental regime —
+fractions stay near-uniform, strategy switching is inactive, and trajectories are
+essentially the noise around x=0. The characteristic BH complex/chaotic dynamics
+require LARGE beta. Verified regime (R=1.01, sigma=0.04, theta=(beta,0.9,0.2,
+0.9,-0.2)): trajectory std grows ~0.05 -> 0.62 as beta 2 -> 100 (up to ~12x the
+noise), with bounded chaotic attractors around beta ~ 50-100. The exact
+Quera-Bofarull 2023 canonical chaos uses 4 types at beta=120 (needs H=4). See
+docs/papers/reference_brock_hommes_1998.md and
+docs/papers/reference_quera_bofarull_2023_differentiable_bh.md.
+
 Ref: Brock & Hommes, "Heterogeneous beliefs and routes to chaos in a simple
-asset pricing model," JEDC 22(8), 1998.
+asset pricing model," JEDC 22(8), 1998; Quera-Bofarull et al. 2023
+(arXiv:2307.01085) for the differentiable implementation.
 """
 
 from __future__ import annotations
