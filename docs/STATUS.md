@@ -37,23 +37,31 @@ correct large-β regime): the old OPG is the gradient covariance, not the GGN.
 | EXP-003 | Can the MMD GGN be estimated under noise? | ✅ done — C04/05/06 |
 | EXP-000 | What did the historical BH OPG measure? | ✅ done — gradient covariance, not GGN (C08 not supported) |
 | EXP-004 | GGN vs Hessian in BH; horizon dependence? | ✅ done — H=G at fit; GGN horizon-biased, tiny validity radius in chaos (C03/C09) |
+| EXP-004b | Is the chaotic GGN explosion representation-driven? | ✅ done — **no, intrinsic**; robust summaries explode more (1.5e6× at β=80) |
 
 ## Key open finding (RQ4 — needs a decision)
 
-**The GGN depends materially on the differentiation horizon** (EXP-004): truncation
-under-estimates curvature magnitude by orders of magnitude at every β, preserves
-the leading direction in the complex regime but distorts it in chaos, and the
-full-horizon curvature explodes (λ₁ ~ 1.5e8 at β=80). This is a novel result
-(second-order was future work in Quera-Bofarull 2025 §8.3). Not yet a registered
-claim — flagged for the scientific lead to decide whether it becomes a headline
-claim + a dedicated experiment (EXP-008 differentiation-fidelity).
+**The GGN depends materially on the differentiation horizon, and in chaos the
+exact GGN is dominated by chaotic sensitivity** (EXP-004). EXP-004b shows this is
+**intrinsic**, not a representation artifact: the explosion lives in `∂X/∂θ`
+(Lyapunov), so *any* pathwise-differentiated observable inherits it (robust
+summaries explode more, not less). Horizon truncation trades explosion for bias.
+Novel (second-order was future work in Quera-Bofarull 2025 §8.3). Not yet a
+registered claim — flagged for the scientific lead: is this a headline
+limitation/claim + a dedicated experiment (EXP-008 differentiation-fidelity)? A
+meaningful chaotic-regime geometry likely needs a fixed horizon or a
+derivative-free/ensemble construction.
 
 ## Immediate next
 
-Candidates (for the scientific lead / gatekeeper to prioritize):
-- **EXP-005 — smooth SIR posterior validation** (the inferential-validity leg, C10/C11).
-- **EXP-008 — differentiation-horizon fidelity**, promoting the RQ4 finding above.
-- Optionally an H=4 canonical BH variant (β=120) to match the literature exactly.
+BH geometry is now characterized (theory holds at the fit; the exact geometry is
+intrinsically sensitivity-dominated in chaos). Recommended pivot to a **smooth,
+non-chaotic** model where the GGN diagnostic and the inferential story should work
+cleanly:
+- **EXP-005 — smooth SIR posterior validation** (the project's inferential-validity
+  goal, C10/C11) — recommended next.
+- **EXP-008 — differentiation-horizon fidelity**, if the scientific lead promotes
+  the RQ4 finding to a headline.
 
 ## Deferred (revive when reached)
 
