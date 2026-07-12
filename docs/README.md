@@ -1,63 +1,71 @@
----
-title: Local Information Geometry of Differentiable ABMs
-status: active
-last_verified: 2026-07-11
----
-
 # Local Information Geometry of Differentiable ABMs
 
-## Current objective
+Front door for the project's documentation. Start here.
 
-Construct and validate the prior-relative generalized Gauss--Newton geometry of calibration objectives for stochastic differentiable agent-based models.
+## What this project is
 
-## Current phase
+Calibration tells us *which parameter values* fit data. This project answers the
+deeper question: **which combinations of parameters are actually informed by the
+observations?**
 
-**Phase 1: mathematical specification, code audit, and controlled validation.**
+The tool is the local **generalized Gauss–Newton (GGN) geometry** of the
+calibration objective. For a calibrated representation `m(z)` and loss
+`L(z) = ½‖m(z) − m_y‖²_W`,
 
-## Canonical documents
+    G(z) = Dm(z)* W Dm(z).
 
-1. [Project Charter](01_PROJECT_CHARTER.md)
-2. [Mathematical Specification](02_MATHEMATICAL_SPECIFICATION.md)
-3. [Claims Ledger](03_CLAIMS_LEDGER.md)
-4. [Experiment Registry](04_EXPERIMENT_REGISTRY.md)
-5. [Results Ledger](05_RESULTS_LEDGER.md)
-6. [Literature Map](06_LITERATURE_MAP.md)
-7. [Decision Log](07_DECISION_LOG.md)
-8. [Paper Architecture](08_PAPER_ARCHITECTURE.md)
+Its eigenvectors are parameter *combinations*; its eigenvalues say how strongly
+the calibrated representation moves along each. The exact Hessian is `H = G + R`,
+so `G` is trustworthy only where the residual-curvature `R` is small. We work in
+prior-scaled coordinates `z` so eigenvalues are comparable to prior precision.
 
-## Immediate next actions
+**Why not gradients?** A gradient says which direction reduces the loss; it does
+not reveal which *combinations* are locally constrained. The earlier project used
+a per-seed scalar-gradient second moment (`F_OPG`) and mistook it for curvature —
+this project rejects that identification (see `DECISIONS.md` DEC-001) and studies
+the true GGN.
 
-1. Audit the current Brock--Hommes and SIR objectives.
-2. Determine whether the current MMD objective is population, biased empirical, or unbiased U-statistic MMD.
-3. Implement the analytic linear benchmark.
-4. Implement a nonlinear benchmark with controlled curvature.
-5. Compute the following four matrices at matched Brock--Hommes parameter values:
-   - exact Hessian;
-   - true MMD generalized Gauss--Newton matrix;
-   - raw per-seed gradient outer-product matrix;
-   - centered stochastic-gradient covariance.
-6. Compare their eigenspaces, spectra, local quadratic predictions, and sample-size dependence.
+**Models:** Brock–Hommes (financial ABM), SIR / network-SIR (epidemic).
 
-## Project status vocabulary
+## How the docs are organized
 
-- **proposed**: plausible but not yet tested;
-- **in progress**: currently being investigated;
-- **supported**: supported by completed evidence;
-- **supported conditionally**: supported under explicitly stated conditions;
-- **not supported**: evidence currently does not support the claim;
-- **rejected**: contradicted mathematically or empirically.
+| File | Role | Changes |
+|---|---|---|
+| `README.md` (this) | Orientation + the recording rule | rarely |
+| `STATUS.md` | Where we are: phase, what's proven, what's next | every experiment |
+| `CLAIMS.md` | Each claim, its status, evidence link | every experiment |
+| `MATH.md` | The corrected mathematical formulation (authoritative) | rarely |
+| `DECISIONS.md` | Dated decisions + rejections (DEC-001 …) | on a real decision |
+| `experiments/EXP-*.md` | One short file per experiment: question · method · result · claim impact | when run |
+| `papers/` | Literature the project relies on | when a paper is studied |
+| `archive/` | Superseded/verbose material (old plans, reviews, retired vault). Frozen. | never |
 
-## Working principle
+**Authority order** when sources disagree: `MATH.md` → `DECISIONS.md` →
+`CLAIMS.md` → `STATUS.md` / `experiments/`.
 
-The vault is the canonical source of project state.
+## The recording rule (definition of done)
 
-```text
-question
-  -> mathematical claim
-  -> registered experiment
-  -> result
-  -> reviewed interpretation
-  -> paper statement
-```
+An experiment updates **exactly three places** — nothing else:
 
-Chat histories, notebooks, preliminary figures, and manuscript drafts are not canonical sources of truth.
+1. **`experiments/EXP-xxx.md`** — fill in the result (the file already exists from
+   when the experiment was planned; use `experiments/TEMPLATE.md`).
+2. **`CLAIMS.md`** — set the affected claim's status + one-line evidence link.
+3. **`STATUS.md`** — advance the phase / set the next experiment.
+
+Anything longer (derivations, full run logs) belongs in the experiment file or in
+the machine run record under `outputs/EXP-xxx/<run-id>/` (gitignored) — never a
+new top-level doc. Studying a paper adds one file under `papers/` and a line in
+`papers/README.md`.
+
+## Status vocabulary
+
+`proposed` · `in progress` · `supported` · `supported conditionally` ·
+`not supported` · `rejected`.
+
+## Code & runs
+
+- Library: `src/curvature_calib/`. Experiments: `experiments/exp0XX_*.py`.
+- Tests: `uv run pytest`. Precision: float64 (`config.enable_x64()` at entry).
+- Every experiment writes a provenance-stamped run record to
+  `outputs/EXP-xxx/<run-id>/` (gitignored). Authoritative runs come from a clean
+  commit (`git_dirty: false`).

@@ -4,10 +4,11 @@ Project standards and orientation for Claude Code. Loaded every session — keep
 
 ## What this is
 
-Research code for the paper *"Curvature-Aware Calibration of Differentiable Agent-Based Models."*
-The central contribution is a **diagnostic** for identifiability in differentiable ABMs: the
-eigenstructure of the curvature matrix exposes which
-parameter *combinations* are stiff (identifiable) vs sloppy (non-identifiable).
+Research code studying the local generalized Gauss–Newton (GGN) geometry of
+calibration objectives for differentiable ABMs — a diagnostic for which parameter
+*combinations* are locally informed by the data. The GGN is `G = Dm* W Dm`; the
+per-seed scalar-gradient OPG is **not** the GGN (DEC-001). Read `docs/README.md`
+first, then `docs/STATUS.md`.
 
 ## Setup & tests
 
@@ -43,17 +44,26 @@ tests/          one test_*.py per module
 
 For a pedagogical end-to-end walkthrough, see `docs/papers/brock_hommes_code_guide.md`.
 
-## Repo status (2026-07-11)
+## Docs & recording discipline (READ THIS)
 
-Directory was **cleared back to the library skeleton**: `src/` + `tests/` + packaging kept; all
-`scripts/`, experiment outputs, `docs/superpowers/` plans+specs, booklets, and the old memory vault
-were removed pending a substantial rewrite and a fresh standard. Do **not** assume old scripts or
-figures exist. `main` and `origin/main` are at the pre-clean commit `e1b3a6f`; the clean is
-uncommitted working-tree state.
+Documentation is deliberately lean. The living docs are: `docs/README.md` (front
+door + this rule), `docs/STATUS.md` (where we are), `docs/CLAIMS.md` (what's
+proven), `docs/MATH.md` (authoritative formulation), `docs/DECISIONS.md`
+(decisions/rejections), `docs/experiments/EXP-*.md` (one short file per
+experiment), `docs/papers/` (literature). `docs/archive/` is frozen — never cite it
+as current state.
 
-## The Claude memory vault
+**Definition of done for an experiment — update exactly three places, nothing else:**
+1. `docs/experiments/EXP-xxx.md` (result; use `experiments/TEMPLATE.md`);
+2. `docs/CLAIMS.md` (claim status + evidence link);
+3. `docs/STATUS.md` (phase / next).
+Long detail → the experiment file or the gitignored `outputs/EXP-xxx/<run-id>/`
+run record. Studying a paper → one file in `docs/papers/` + a line in its README.
+Do **not** create new top-level docs or an `inbox/`.
 
-Durable session memory lives in `docs/memory/` (gitignored; mirrored to `~/.claude/.../memory/`).
-`docs/memory/MEMORY.md` is the index loaded each session — one line per memory. Add memories as
-focused single-fact files with frontmatter (`type: user | feedback | project | reference`); link
-related ones with `[[slug]]`. Keep durable facts; don't record transient run logs.
+## Memory vault
+
+Durable session memory lives in `docs/memory/` (gitignored; mirrored to
+`~/.claude/.../memory/`); `docs/memory/MEMORY.md` is the index. Add focused
+single-fact files (`type: user | feedback | project | reference`). Durable facts
+only — no transient run logs.
