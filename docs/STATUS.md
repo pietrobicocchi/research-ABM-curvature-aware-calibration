@@ -24,6 +24,9 @@ correct large-β regime): the old OPG is the gradient covariance, not the GGN.
 - **C04, C05, C06** supported conditionally — MMD GGN estimable from feature
   Jacobians on a controlled Gaussian/RFF simulator; plug-in `O(1/M)` bias,
   cross-seed unbiased-but-indefinite.
+- **C10, C11** supported conditionally — on smooth SIR the prior-relative GGN
+  matches the local posterior contours (axes ~1°, d_data=3) and the profiled
+  posterior energy (<0.5%). The positive inferential result (EXP-005).
 - **C08** not supported — the historical BH OPG ≈ gradient covariance `C_g`,
   nearly orthogonal to the true GGN (EXP-000).
 - **C07, C17, C18, C19** rejected (see CLAIMS.md).
@@ -38,6 +41,7 @@ correct large-β regime): the old OPG is the gradient covariance, not the GGN.
 | EXP-000 | What did the historical BH OPG measure? | ✅ done — gradient covariance, not GGN (C08 not supported) |
 | EXP-004 | GGN vs Hessian in BH; horizon dependence? | ✅ done — H=G at fit; GGN horizon-biased, tiny validity radius in chaos (C03/C09) |
 | EXP-004b | Is the chaotic GGN explosion representation-driven? | ✅ done — **no, intrinsic**; robust summaries explode more (1.5e6× at β=80) |
+| EXP-005 | Does the prior-relative GGN match the SIR posterior? | ✅ done — **yes** on smooth SIR: axes ~1°, profiles <0.5% (C10, C11) |
 
 ## Key open finding (RQ4 — needs a decision)
 
@@ -54,14 +58,15 @@ derivative-free/ensemble construction.
 
 ## Immediate next
 
-BH geometry is now characterized (theory holds at the fit; the exact geometry is
-intrinsically sensitivity-dominated in chaos). Recommended pivot to a **smooth,
-non-chaotic** model where the GGN diagnostic and the inferential story should work
-cleanly:
-- **EXP-005 — smooth SIR posterior validation** (the project's inferential-validity
-  goal, C10/C11) — recommended next.
-- **EXP-008 — differentiation-horizon fidelity**, if the scientific lead promotes
-  the RQ4 finding to a headline.
+The core instrument + inferential story is now in place: GGN computed (EXP-001),
+Hessian-approx characterized (EXP-002), MMD-estimable (EXP-003), and validated
+against a real posterior on smooth SIR (EXP-005). The BH chapter is an honest
+scope boundary (EXP-004/004b: chaos breaks the exact geometry). Candidates (for
+the scientific lead / gatekeeper to prioritize):
+- **EXP-006 — SIR policy-functional analysis** (does a weak direction change a
+  policy quantity? C12) — the "scientific consequence" leg.
+- **EXP-008 — differentiation-horizon fidelity**, promoting the RQ4/chaos finding.
+- **EXP-007 — observation-design** (C13); or discrete/stochastic SIR (C14/C15).
 
 ## Deferred (revive when reached)
 
