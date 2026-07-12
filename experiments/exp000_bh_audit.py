@@ -34,12 +34,19 @@ from curvature_calib.models.brock_hommes import simulate  # noqa: E402
 
 _COMMAND = "uv run python -m experiments.exp000_bh_audit"
 
-T, R_GR, SIGMA = 150, 1.1, 0.03
+# Canonical BH regime (R=1.01, sigma=0.04). LARGE beta => rich/chaotic dynamics
+# (verified: beta drives the route to chaos; see docs/papers/reference_brock_hommes_1998.md).
+T, R_GR, SIGMA = 100, 1.01, 0.04
+# Gradient-horizon truncation is REQUIRED in the chaotic regime: full-horizon
+# pathwise gradients explode (sensitive dependence). We use ONE fixed horizon for
+# all four matrices so they are comparable; the full-horizon explosion is reported
+# as a finding. (Quera-Bofarull 2023 use H=0 for calibration; we use a small
+# horizon that keeps the geometry finite and multi-directional.)
+GRAD_HORIZON = 20
 S_PRIOR = jnp.array([0.30, 0.10, 0.05, 0.10, 0.05])   # documented prior scales
 POINTS = {
-    "P1_quiescent": (2.0, 0.6, 0.05, 0.5, -0.05),
-    "P2_near_critical": (3.0, 1.35, 0.15, 1.25, -0.10),
-    "P3_edge": (5.0, 1.5, 0.20, 1.4, -0.15),
+    "P1_complex": (50.0, 0.9, 0.2, 0.9, -0.2),   # strong endogenous dynamics
+    "P2_chaotic": (80.0, 0.9, 0.2, 0.9, -0.2),   # chaotic (std ~12x noise)
 }
 D_FEAT, FEATURE_SEED = 256, 7
 M_GRID = (32, 128)
@@ -54,8 +61,9 @@ def _theta(theta0, z):
     return jnp.asarray(theta0) + S_PRIOR * z
 
 
-def _sim_z(theta0):
-    return lambda z, key: simulate(_theta(theta0, z), key, T=T, R=R_GR, sigma=SIGMA)
+def _sim_z(theta0, grad_horizon=GRAD_HORIZON):
+    return lambda z, key: simulate(_theta(theta0, z), key, T=T, R=R_GR, sigma=SIGMA,
+                                   grad_horizon=grad_horizon)
 
 
 def _frozen_features(theta0, keys):
@@ -65,8 +73,8 @@ def _frozen_features(theta0, keys):
     return rff, gamma
 
 
-def _eta_hat_fn(theta0, rff, keys):
-    sim = _sim_z(theta0)
+def _eta_hat_fn(theta0, rff, keys, grad_horizon=GRAD_HORIZON):
+    sim = _sim_z(theta0, grad_horizon)
     def eta_hat(z):
         X = jax.vmap(lambda k: sim(z, k))(keys)          # (M, T)
         return jnp.mean(R.feature_map(rff, X), axis=0)   # (D,)
@@ -102,7 +110,7 @@ def _point_audit(name, theta0):
     eta_hat = _eta_hat_fn(theta0, rff, keys)
 
     # true representation geometry (residual-independent G; H depends on target)
-    Jeta = jax.jacfwd(eta_hat)(Z0)                       # (D, P)
+    Jeta = jax.jacfwd(eta_hat)(Z0)                       # (D, P), horizon-truncated
     G = jnp.asarray(0.5 * (Jeta.T @ Jeta + (Jeta.T @ Jeta).T))
     eta0 = eta_hat(Z0)
     v_stiff = DIAG.eigendecompose(G).eigvecs[:, 0]       # move target along stiff dir
@@ -110,6 +118,22 @@ def _point_audit(name, theta0):
     # dynamics descriptor
     Xp = vmap_simulate(_sim_z(theta0), Z0, keys)
     ac1 = float(np.mean([np.corrcoef(np.asarray(x[:-1]), np.asarray(x[1:]))[0, 1] for x in Xp]))
+    traj_std = float(np.std(np.asarray(Xp)))
+
+    # full-horizon explosion diagnostic: the "true" pathwise GGN is numerically
+    # inaccessible in the chaotic regime (sensitive dependence). Compare the
+    # feature-Jacobian norm and G condition number at full horizon vs truncated.
+    eta_full = _eta_hat_fn(theta0, rff, keys, grad_horizon=None)
+    J_full = jax.jacfwd(eta_full)(Z0)
+    ev_t = np.sort(np.asarray(jnp.linalg.eigvalsh(G)))[::-1]
+    horizon_explosion = {
+        "grad_horizon": GRAD_HORIZON,
+        "Jeta_norm_truncated": float(jnp.linalg.norm(Jeta)),
+        "Jeta_norm_full_horizon": float(jnp.linalg.norm(J_full)),
+        "explosion_ratio": float(jnp.linalg.norm(J_full)) / max(float(jnp.linalg.norm(Jeta)), 1e-300),
+        "G_cond_truncated": float(ev_t[0] / max(ev_t[-1], 1e-300)),
+        "G_effective_rank_truncated": int((ev_t > 1e-6 * ev_t[0]).sum()),
+    }
 
     per_delta = {}
     for delta in DELTAS:
@@ -177,31 +201,31 @@ def _point_audit(name, theta0):
                              "dL": dL.tolist(), "quad_pred": Q.tolist()}
 
     # outcome classification from the largest-residual cell, M=128.
-    # NOTE: G is effectively rank-1 here, so the top-1 direction is shared by
-    # F_OPG, C_g, and G — a top-1 angle cannot distinguish them. The robust
-    # discriminator is whether F_OPG matches the gradient covariance C_g in FULL
-    # (F_OPG = C_g + ḡḡᵀ) and how its SCALE compares to the true GGN.
+    # G is now multi-directional (rank ~4 in the rich regime), so we compare the
+    # top-2 SUBSPACE of the mean F_OPG against G (curvature) vs C_g (gradient
+    # covariance). Nearest wins; neither within threshold => C.
     ref = per_delta[f"delta_{DELTAS[-1]}"]["opg_by_M"]["128"]
+    aFG = ref["F_vs_G"]["top2_angle"] if ref["F_vs_G"] else None
+    aFC = ref["F_vs_Cg"]["top2_angle"] if ref["F_vs_Cg"] else None
     rF_Cg = ref["F_vs_Cg"]["rel_fro"] if ref["F_vs_Cg"] else None
-    rF_G_tn = ref["F_vs_G"]["rel_fro_tracenorm"] if ref["F_vs_G"] else None
     scale = ref["F_scale_over_G_scale"]
-    g_rank1 = (DIAG.eigendecompose(G).eigvals[1] / DIAG.eigendecompose(G).eigvals[0]) < 1e-2
-    if rF_G_tn is not None and rF_G_tn < 0.20 and g_rank1:
-        outcome = ("A_OPG~GGN-direction (RANK-1 COINCIDENCE: F_OPG=Jᵀrrᵀ J "
-                   "collapses onto G's single informed direction; scale is "
-                   "residual-dependent and →0 at exact fit; NO theoretical "
-                   "equivalence — DEC-001)")
-    elif rF_Cg is not None and rF_Cg < 0.20:
-        outcome = "B_OPG~grad_cov (F_OPG≈C_g)"
-    elif rF_G_tn is not None and rF_G_tn < 0.20:
-        outcome = "A_OPG~GGN (shape and scale)"
+    thr = np.radians(20)
+    if aFG is not None and aFC is not None:
+        if aFG < thr and aFG <= aFC:
+            outcome = "A_OPG~GGN (top-2 subspace)"
+        elif aFC < thr and aFC < aFG:
+            outcome = "B_OPG~grad_cov (top-2 subspace)"
+        else:
+            outcome = "C_neither"
     else:
-        outcome = "C_neither"
-    outcome_detail = {"rel_fro_F_vs_Cg": rF_Cg, "rel_fro_tracenorm_F_vs_G": rF_G_tn,
-                      "F_scale_over_G_scale": scale, "G_effectively_rank1": bool(g_rank1)}
+        outcome = "undetermined"
+    outcome_detail = {"top2_angle_F_G_deg": float(np.degrees(aFG)) if aFG is not None else None,
+                      "top2_angle_F_Cg_deg": float(np.degrees(aFC)) if aFC is not None else None,
+                      "rel_fro_F_vs_Cg": rF_Cg, "F_scale_over_G_scale": scale}
 
     return {
-        "theta_physical": list(theta0), "z_star": [0.0] * 5, "gamma": gamma, "ac1": ac1,
+        "theta_physical": list(theta0), "z_star": [0.0] * 5, "gamma": gamma,
+        "ac1": ac1, "traj_std": traj_std, "horizon_explosion": horizon_explosion,
         "G_summary": _matrix_summary("G", G),
         "per_delta": per_delta, "predictive": predictive,
         "outcome": outcome, "outcome_detail": outcome_detail,
@@ -256,12 +280,15 @@ def run(out_root="outputs/EXP-000") -> str:
     metrics = {"points": points,
                "outcomes": {n: points[n]["outcome"] for n in points}}
     config = {
-        "T": T, "R": R_GR, "sigma": SIGMA, "prior_scales": S_PRIOR.tolist(),
+        "T": T, "R": R_GR, "sigma": SIGMA, "grad_horizon": GRAD_HORIZON,
+        "prior_scales": S_PRIOR.tolist(),
         "points_physical": {k: list(v) for k, v in POINTS.items()},
         "D_feat": D_FEAT, "feature_seed": FEATURE_SEED, "M_grid": list(M_GRID),
         "B": B, "deltas": list(DELTAS), "alphas": ALPHAS.tolist(),
-        "regime_note": "no bounded periodic/chaotic BH attractor available; "
-                       "points span accessible stochastic dynamics (see plan §C).",
+        "regime_note": "LARGE-beta rich/chaotic BH regime (beta=50,80; R=1.01, "
+                       "sigma=0.04). Full-horizon gradients explode; a fixed "
+                       "grad_horizon is used for all four matrices (see "
+                       "horizon_explosion per point).",
     }
     prov.write_json(run_dir / "config.json", config)
     prov.write_json(run_dir / "provenance.json",
