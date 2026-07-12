@@ -17,7 +17,7 @@ Only claims marked **supported** or **supported conditionally** may enter the ab
 | C05 | The PSD plug-in MMD estimator exhibits the predicted PSD O(1/M) finite-sample bias. | supported conditionally | EXP-003 | RES-003 (commit ce45c43) | Results |
 | C06 | The cross-seed MMD estimator is unbiased within Monte-Carlo resolution but may be indefinite at small sample sizes. | supported conditionally | EXP-003 | RES-003 (commit ce45c43) | Results |
 | C07 | Raw per-seed scalar-loss OPG estimates the GGN. | rejected | contradicted algebraically | scalar and residual counterexamples | nowhere |
-| C08 | The old OPG eigenspaces align with the true GGN on Brock--Hommes. | proposed | EXP-000 | none | Comparison / Appendix |
+| C08 | The old OPG eigenspaces align with the true GGN on Brock--Hommes. | not supported | EXP-000 | EXP-000: F_OPG ≈ gradient covariance C_g, nearly orthogonal to the GGN (top-2 angle 86° at β=80) | Comparison / Appendix |
 | C09 | The local GGN predicts actual loss changes over a nontrivial radius near exact or low-residual fits; the validity radius shrinks with curvature and collapses under non-negligible residual-curvature bias. | supported conditionally | EXP-002 (+EXP-004, EXP-005) | RES-002 (commit 4118f4e) | Results |
 | C10 | Prior-relative GGN directions agree with local posterior contours in smooth SIR. | proposed | EXP-005 | none | Results |
 | C11 | Weak prior-relative SIR directions agree with profiled generalized-posterior energy. | proposed | EXP-005 | none | Results |
