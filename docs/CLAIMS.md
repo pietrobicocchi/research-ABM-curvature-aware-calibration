@@ -21,7 +21,7 @@ Only claims marked **supported** or **supported conditionally** may enter the ab
 | C09 | The local GGN predicts actual loss changes over a nontrivial radius near exact or low-residual fits; the validity radius shrinks with curvature and collapses under non-negligible residual-curvature bias. | supported conditionally | EXP-002 (+EXP-004 BH, EXP-005) | EXP-002; EXP-004: in chaotic BH the radius is very small (≈0.003 at β=50, →0 at β=80) | Results |
 | C10 | Prior-relative GGN directions agree with local posterior contours in smooth SIR. | supported conditionally | EXP-005 | EXP-005: leading posterior axes agree to ~1°, cov error 25%, d_data=3 (mild non-Gaussianity in t_lock) | Results |
 | C11 | Weak prior-relative SIR directions agree with profiled generalized-posterior energy. | supported conditionally | EXP-005 | EXP-005: profiled posterior energy matches the GGN quadratic to <0.5% (stiff & sloppy) | Results |
-| C12 | A locally weak SIR direction materially changes a policy quantity. | proposed | EXP-006 | old OPG evidence is not sufficient | Results |
+| C12 | A locally weak SIR direction materially changes a policy quantity. | supported conditionally | EXP-006 | EXP-006: the counterfactual intervention value spans ~0→2180 cases within a good fit, along the sloppiest GGN direction (f_lock); observed cases stay ±0.3% | Results |
 | C13 | Additional observations increase information in the weak direction. | proposed | EXP-007 | none | Results |
 | C14 | Important local eigenspaces are robust to the chosen surrogate gradient. | proposed | EXP-008 | old results require recomputation | Results |
 | C15 | Truncated differentiation can destroy local information geometry in transient models. | proposed | EXP-008 | old OPG evidence only | Results |
