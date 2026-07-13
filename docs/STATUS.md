@@ -30,6 +30,10 @@ correct large-β regime): the old OPG is the gradient covariance, not the GGN.
 - **C12** supported conditionally — a sloppy GGN direction leaves a policy quantity
   undetermined: the SIR intervention value spans ~0→2180 cases within a good fit
   (along f_lock), while observed cases stay ±0.3% (EXP-006). The scientific consequence.
+- **C13** supported conditionally — a targeted added observation (compliance) lifts
+  the weak f_lock direction λ 8.9e-6→10 (d_data 3→5) and collapses the policy
+  uncertainty 57×; a redundant one (prevalence) does not. The diagnostic is
+  actionable (EXP-007).
 - **C08** not supported — the historical BH OPG ≈ gradient covariance `C_g`,
   nearly orthogonal to the true GGN (EXP-000).
 - **C07, C17, C18, C19** rejected (see CLAIMS.md).
@@ -46,6 +50,7 @@ correct large-β regime): the old OPG is the gradient covariance, not the GGN.
 | EXP-004b | Is the chaotic GGN explosion representation-driven? | ✅ done — **no, intrinsic**; robust summaries explode more (1.5e6× at β=80) |
 | EXP-005 | Does the prior-relative GGN match the SIR posterior? | ✅ done — **yes** on smooth SIR: axes ~1°, profiles <0.5% (C10, C11) |
 | EXP-006 | Does a sloppy direction change a policy output? | ✅ done — **yes**: intervention value ~0→2180 cases within a good fit (C12) |
+| EXP-007 | Which added observation informs the weak direction? | ✅ done — compliance: λ 8.9e-6→10, policy uncertainty ↓57× (C13) |
 
 ## Key open finding (RQ4 — needs a decision)
 
@@ -63,16 +68,17 @@ derivative-free/ensemble construction.
 ## Immediate next
 
 The full arc is now demonstrated end-to-end on smooth SIR: compute the GGN
-(EXP-001), know when it approximates the Hessian (EXP-002), estimate it under
-noise (EXP-003), validate it against a real posterior (EXP-005), and show a sloppy
-direction leaves a **policy** answer undetermined (EXP-006). BH is an honest scope
-boundary (EXP-004/004b). Candidates (scientific lead / gatekeeper to prioritize):
-- **EXP-007 — observation design** (C13): does adding observations during/after
-  the lockdown constrain `f_lock` and collapse the EXP-006 intervention-value
-  freedom? The natural sequel to EXP-006.
-- **EXP-008 — differentiation-horizon fidelity**, promoting the RQ4/chaos finding.
-- Discrete/stochastic SIR derivative fidelity (C14/C15); or a first manuscript pass
-  (the minimum-viable-paper arc C01–C12 is now covered).
+(EXP-001) → know when it ≈ Hessian (EXP-002) → estimate under noise (EXP-003) →
+validate against a real posterior (EXP-005, C10/C11) → a sloppy direction breaks a
+**policy** answer (EXP-006, C12) → the right added observation **fixes** it
+(EXP-007, C13). BH is an honest scope boundary (EXP-004/004b). The
+minimum-viable-paper claim arc **C01–C13 is covered**; remaining is depth/robustness.
+
+Candidates (scientific lead / gatekeeper to prioritize):
+- **First manuscript pass** — the evidence for the MVP arc is complete.
+- **EXP-008 — differentiation fidelity**: discrete/stochastic SIR surrogate
+  gradients (C14/C15) + promoting the RQ4/chaos horizon finding.
+- **EXP-009 — computational scaling** (C16), if a scaling claim is wanted.
 
 ## Deferred (revive when reached)
 

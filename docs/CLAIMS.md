@@ -22,7 +22,7 @@ Only claims marked **supported** or **supported conditionally** may enter the ab
 | C10 | Prior-relative GGN directions agree with local posterior contours in smooth SIR. | supported conditionally | EXP-005 | EXP-005: leading posterior axes agree to ~1°, cov error 25%, d_data=3 (mild non-Gaussianity in t_lock) | Results |
 | C11 | Weak prior-relative SIR directions agree with profiled generalized-posterior energy. | supported conditionally | EXP-005 | EXP-005: profiled posterior energy matches the GGN quadratic to <0.5% (stiff & sloppy) | Results |
 | C12 | A locally weak SIR direction materially changes a policy quantity. | supported conditionally | EXP-006 | EXP-006: the counterfactual intervention value spans ~0→2180 cases within a good fit, along the sloppiest GGN direction (f_lock); observed cases stay ±0.3% | Results |
-| C13 | Additional observations increase information in the weak direction. | proposed | EXP-007 | none | Results |
+| C13 | Additional observations increase information in the weak direction. | supported conditionally | EXP-007 | EXP-007: compliance data lifts the weak f_lock direction λ 8.9e-6→10 (d_data 3→5), collapsing policy uncertainty 57×; redundant prevalence does not | Results |
 | C14 | Important local eigenspaces are robust to the chosen surrogate gradient. | proposed | EXP-008 | old results require recomputation | Results |
 | C15 | Truncated differentiation can destroy local information geometry in transient models. | proposed | EXP-008 | old OPG evidence only | Results |
 | C16 | AD-based GGN estimation is computationally preferable to finite-difference Hessians at demonstrated scales. | proposed | EXP-009 | none | Results |
