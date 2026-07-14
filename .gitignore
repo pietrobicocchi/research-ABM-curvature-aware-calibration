@@ -41,6 +41,14 @@ mlruns/
 checkpoints/
 
 # LaTeX build artefacts
+docs/paper/*.aux
+docs/paper/*.log
+docs/paper/*.out
+docs/paper/*.bbl
+docs/paper/*.blg
+docs/paper/*.fls
+docs/paper/*.fdb_latexmk
+docs/paper/*.synctex.gz
 paper/*.aux
 paper/*.log
 paper/*.out

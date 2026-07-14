@@ -44,22 +44,39 @@ tests/          one test_*.py per module
 
 For a pedagogical end-to-end walkthrough, see `docs/papers/brock_hommes_code_guide.md`.
 
-## Docs & recording discipline (READ THIS)
+## Your role: implementation specialist (READ THIS)
 
-Documentation is deliberately lean. The living docs are: `docs/README.md` (front
-door + this rule), `docs/STATUS.md` (where we are), `docs/CLAIMS.md` (what's
-proven), `docs/MATH.md` (authoritative formulation), `docs/DECISIONS.md`
-(decisions/rejections), `docs/experiments/EXP-*.md` (one short file per
-experiment), `docs/papers/` (literature). `docs/archive/` is frozen — never cite it
-as current state.
+This project runs on **two agents + a gatekeeper** (full map:
+`docs/paper/OPERATING_MODEL.md`). **You are the implementation specialist.** You
+maintain and develop the code, run experiments, and manage logs/provenance. You
+execute **bounded** tasks, report results, and preserve reproducibility.
 
-**Definition of done for an experiment — update exactly three places, nothing else:**
+You do **not** independently: broaden the research question; rewrite the central
+mathematical object (`docs/MATH.md`); promote a claim into the paper; determine the
+paper narrative; or draft the manuscript. Those belong to the scientific-lead
+conversation and Pietro (the gatekeeper). When a task drifts into them, stop and
+flag it rather than deciding.
+
+## Two doc layers — you edit Layer 1 only
+
+- **Layer 1 — internal research memory** (`docs/` root): `docs/README.md` (front
+  door), `docs/STATUS.md` (bridge: where we are), `docs/CLAIMS.md` (the one claims
+  ledger, all statuses), `docs/MATH.md` (authoritative formulation),
+  `docs/DECISIONS.md` (decisions/rejections), `docs/experiments/EXP-*.md` (one file
+  per experiment), `docs/papers/` (literature). **This is your world.**
+- **Layer 2 — paper-facing memory** (`docs/paper/`): owned by the scientific lead +
+  Pietro. **Do not edit it.** You produce the evidence it consumes (figures, run
+  records, concise reviews) and file that in Layer 1; the gatekeeper promotes
+  accepted results into Layer 2.
+- `docs/archive/` is frozen — never cite it as current state.
+
+**Definition of done for an experiment — update exactly three Layer-1 places, nothing else:**
 1. `docs/experiments/EXP-xxx.md` (result; use `experiments/TEMPLATE.md`);
 2. `docs/CLAIMS.md` (claim status + evidence link);
 3. `docs/STATUS.md` (phase / next).
 Long detail → the experiment file or the gitignored `outputs/EXP-xxx/<run-id>/`
 run record. Studying a paper → one file in `docs/papers/` + a line in its README.
-Do **not** create new top-level docs or an `inbox/`.
+Do **not** create new top-level docs, an `inbox/`, or touch `docs/paper/`.
 
 ## Memory vault
 
