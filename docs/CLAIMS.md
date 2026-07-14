@@ -29,7 +29,7 @@ Only claims marked **supported** or **supported conditionally** may enter the ab
 | C17 | Small local eigenvalues prove structural non-identifiability. | rejected | false in general | conceptual counterexamples | nowhere |
 | C18 | Posterior curvature can be interpreted as data information without separating the prior. | rejected | false by decomposition | Mathematical Specification | nowhere |
 | C19 | MMD is the only common calibration loss admitting a GGN. | rejected | GGN applies more broadly | standard composite-loss theory | nowhere |
-| C20 | The proposed method is a local diagnostic relevant to practical non-identifiability, not a complete global test. | supported conditionally | conceptual analysis | Mathematical Specification | Introduction / Discussion |
+| C20 | The proposed method is a local diagnostic relevant to practical non-identifiability, not a complete global test. | supported conditionally | conceptual analysis (+EXP-010 usability) | Mathematical Specification; EXP-010: prior-relative stiff eigenspace + d_data stable across the whole smooth-SIR calibration basin, available before convergence | Introduction / Discussion |
 
 ## Scope note on C01
 

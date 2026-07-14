@@ -8,12 +8,15 @@ paper direction, see Layer 2 `paper/STRATEGIC_HANDOFF.md`.
 
 ## Current phase
 
-**Phase 4 — Brock–Hommes geometry (post-instrument-validation).**
+**Phase 7 — evidence arc frozen (C01–C15), figures in progress.**
 
-The instrument is validated: we know how to compute the GGN (EXP-001), when it
-approximates the Hessian (EXP-002), and how to estimate it under stochastic
-simulation (EXP-003). The historical-OPG audit (EXP-000) is done (redone in the
-correct large-β regime): the old OPG is the gradient covariance, not the GGN.
+The full arc is validated end-to-end: compute the GGN (EXP-001) → know when it ≈
+Hessian (EXP-002) → estimate under noise (EXP-003) → real-ABM validation + scope
+boundary in Brock–Hommes (EXP-004/004b) → match the SIR posterior (EXP-005) →
+policy underdetermination (EXP-006) → observation design (EXP-007) → survives a
+stochastic/discrete/surrogate ABM at two operating points (EXP-008). The
+figure-generation pass is underway; EXP-010 (calibration-path stability, FIG-09) is
+the last new run.
 
 ## What's proven (see CLAIMS.md for evidence)
 
@@ -42,6 +45,11 @@ correct large-β regime): the old OPG is the gradient covariance, not the GGN.
   geometry: halving the horizon rotates the leading eigenspace ~80° and collapses
   its top eigenvalue to 15% of full (→1% at T/8) (EXP-008). Empirical counterpart to
   the RQ4 limitation (DEC-011).
+- **C20** supported conditionally — the diagnostic is a *usable* local instrument:
+  on smooth SIR the prior-relative geometry (stiff eigenspace + d_data=3) is stable
+  across the whole calibration basin, available from the first displaced iterate
+  (loss 5051× final), not just at the optimum — unlike offline FD/surrogate Hessians
+  (EXP-010; FIG-09).
 - **C08** not supported — the historical BH OPG ≈ gradient covariance `C_g`,
   nearly orthogonal to the true GGN (EXP-000).
 - **C07, C17, C18, C19** rejected (see CLAIMS.md).
@@ -60,6 +68,7 @@ correct large-β regime): the old OPG is the gradient covariance, not the GGN.
 | EXP-006 | Does a sloppy direction change a policy output? | ✅ done — **yes**: intervention value ~0→2180 cases within a good fit (C12) |
 | EXP-007 | Which added observation informs the weak direction? | ✅ done — compliance: λ 8.9e-6→10, policy uncertainty ↓57× (C13) |
 | EXP-008 | Is discrete-SIR GGN geometry robust to the surrogate, and does horizon truncation destroy it? | ✅ done — leading eigenspace robust Gumbel↔ST ~8.4–8.9° at **two** operating points; horizon truncation rotates it ~80° + collapses λ (C14, C15) |
+| EXP-010 | Is the local geometry stable along the calibration path, not just at the fit? | ✅ done — **yes** on smooth SIR: d_data=3 and leading-3 eigenspace within ~10° of final from the first displaced iterate (loss 5051× final), decaying to <0.1° at the fit (supports C20; FIG-09) |
 
 ## Scope limitations
 
