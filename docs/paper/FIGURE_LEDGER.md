@@ -138,7 +138,7 @@ One 2D slice; a visual, not a global proof.
 ### Data source
 
 Script `experiments/fig02_ellipse.py`. Run
-`outputs/FIG-02/20260714T205637Z_4ee0e10/` (commit `4ee0e10`, **dirty=false**).
+`outputs/FIG-02/20260714T222454Z_ef729d7/` (commit `ef729d7`, **dirty=false**).
 SIR contour panel: fresh 2D loss grid (121²) around
 the EXP-005 smooth-SIR fit in the (γ, I₀) plane — the one cleanly readable plane
 (every other pair is dominated by the single ultra-stiff λ₁≈2.5×10⁴ direction).
@@ -453,7 +453,7 @@ A single trajectory does not establish path-independence.
 ### Data source
 
 EXP-010 · `docs/experiments/EXP-010.md`. Run
-`outputs/EXP-010/20260714T205630Z_4ee0e10/` (commit `4ee0e10`, **dirty=false**).
+`outputs/EXP-010/20260714T222540Z_ef729d7/` (commit `ef729d7`, **dirty=false**).
 Script `experiments/exp010_calibration_path.py`.
 
 ### Status
