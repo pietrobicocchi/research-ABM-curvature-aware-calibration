@@ -1,7 +1,7 @@
 ---
 title: Decision Log
 status: active
-last_verified: 2026-07-11
+last_verified: 2026-07-14
 ---
 
 # Decision Log
@@ -206,6 +206,110 @@ The old paper was organized around an invalid OPG-curvature identification and c
 
 - old material can supply model provenance and historical context;
 - claims, equations, figures, and discussion must be rebuilt from the canonical vault.
+
+---
+
+## DEC-010 — Two-layer docs for a two-agent operating model
+
+**Date:** 2026-07-12
+
+**Decision**
+
+Split the documentation into two layers matching a two-agent + gatekeeper workflow:
+**Layer 1 — internal research memory** (`docs/` root: MATH, CLAIMS, DECISIONS,
+experiments, papers, STATUS) owned by the implementation specialist; **Layer 2 —
+paper-facing memory** (`docs/paper/`: OPERATING_MODEL, STRATEGIC_HANDOFF,
+PAPER_ARCHITECTURE, WRITING_BRIEF, EVIDENCE_MAP, FIGURE_LEDGER) owned by the
+scientific-lead conversation + Pietro. The manuscript is written from Layer 2.
+
+**Reason**
+
+The research history necessarily contains corrections (e.g. the OPG
+re-interpretation, DEC-001). That history matters for integrity but is not the
+paper's scientific argument. Separating the accepted state (Layer 2) from the full
+history (Layer 1) prevents another correction-shaped manuscript and lets a fresh
+agent with no experiment log write from the accepted state.
+
+**Alternatives considered**
+
+- A single narrative brief bolted onto the lean docs — rejected: no clean owner,
+  drifts on every experiment.
+- A separate results ledger (`RES-00x`) as in the archived vault — rejected: a
+  second results record beside the EXP files; `CLAIMS.md` is the single ledger and
+  Layer 2 cites experiment + commit.
+
+**Consequences**
+
+- Two definitions of done: implementation specialist updates Layer 1 (the three
+  places) per experiment and never edits `docs/paper/`; the scientific lead updates
+  Layer 2 per *accepted* result.
+- Layer 2 is a **derived projection** — it references Layer-1 facts by ID and never
+  invents them; on disagreement Layer 1 wins.
+- `CLAUDE.md` and `docs/README.md` updated to encode the roles and the layer split.
+- The uploaded `scientific-lead-agent/` drafts became the seed of `docs/paper/`,
+  re-anchored onto the lean docs and de-staled to the EXP-000 result.
+- `docs/archive/vault/` stays frozen; nothing resurrected wholesale.
+
+**Revisit only if**
+
+The two-agent workflow is abandoned, or Layer 2 duplication starts causing drift
+despite the reference-by-ID rule.
+
+---
+
+## DEC-011 — RQ4 (differentiation-horizon dependence / chaotic GGN explosion) is a scope limitation, not a headline claim
+
+**Date:** 2026-07-14
+
+**Decision**
+
+The finding that the GGN depends materially on the differentiation horizon — and
+that in the chaotic Brock–Hommes regime the exact pathwise GGN is dominated by
+chaotic (Lyapunov) sensitivity — is recorded as a **scope limitation** of the
+local-geometry diagnostic. It will not be promoted into a headline claim, and no
+dedicated differentiation-fidelity experiment is spun up to elevate it. Smooth SIR
+(EXP-005/006/007) remains the inferential core; Brock–Hommes chaos is an honest
+boundary of applicability.
+
+**Reason**
+
+EXP-004/004b established the effect is **intrinsic** — it lives in `∂X/∂θ`
+(Lyapunov-driven), not in the choice of representation — so no change of observable
+removes it and any pathwise-differentiated observable inherits it (robust summaries
+explode more, not less). That makes it a property of pathwise differentiation of
+chaotic simulators, i.e. a boundary on where the local GGN is meaningful, rather
+than a result the paper must defend as a contribution. The MVP claim arc
+(C01–C13) is complete without promoting it.
+
+**Alternatives considered**
+
+- Promote RQ4 to a headline limitation-claim plus a dedicated "EXP-008
+  differentiation-fidelity" experiment — rejected: over-invests in a negative
+  boundary result and conflates it with the genuinely open stochastic/discrete
+  keystone, for which the EXP-008 label is now reserved.
+
+**Consequences**
+
+- `docs/STATUS.md` drops the "Key open finding (RQ4 — needs a decision)" block;
+  RQ4 becomes a stated scope limitation (Discussion/scope), owned by Layer 2 at
+  manuscript time.
+- The label **EXP-008** is freed for its intended meaning: the stochastic/discrete
+  MMD derivative-fidelity keystone (C14/C15, per [DEC-007](#dec-007--smooth-sir-before-discrete-sir)),
+  not RQ4 promotion.
+- A fixed-horizon or derivative-free/ensemble GGN for chaotic regimes remains
+  future work, not a blocker.
+
+**Evidence**
+
+EXP-004 (H=G at the BH fit to 1e-16, GGN horizon-biased, validity radius →0 in
+chaos); EXP-004b (explosion intrinsic; robust summaries explode more, 1.5e6× at
+β=80).
+
+**Revisit only if**
+
+A fixed-horizon or ensemble/derivative-free GGN construction makes the
+chaotic-regime geometry stable and informative, turning the limitation into a
+tractable result.
 
 ---
 

@@ -100,6 +100,41 @@ paper additionally shows *temporal* sensitivity profiles — how ∂Φ/∂θ_i v
 simulation time steps, something a scalar finite-difference sensitivity cannot show without
 re-running at every time point.
 
+## Verified §-level implementation map (arXiv:2509.03303v1 HTML, checked 2026-07-14 — for EXP-008)
+
+Pulled directly from the paper to anchor the discrete-SIR AD consistency check:
+
+- **§2.3 SIR is discrete per-agent / network-based:** each agent has state
+  `s_i(t) ∈ {S, I, R}` on a contact network — genuinely discrete per-agent, **not**
+  a relaxed continuous compartment. Policies (quarantine, social distancing) are
+  time-window interventions `t ∈ {Q_start,…,Q_end}`.
+- **§3.3 discrete control-flow smoothing:** parameter-dependent predicates are
+  relaxed with a **Gaussian CDF, sigmoid, or piecewise-linear** surrogate (both
+  branches evaluated, blended by the smoothed indicator).
+- **§3.4 discrete-randomness estimators, compared not defaulted:** §3.4.1
+  Straight-Through (ST); §3.4.2 Gumbel-Softmax (GS), temperature τ (Fig. 5 uses
+  τ=0.1/0.5/1.0 illustratively); §3.4.3 stochastic derivatives / StochasticAD
+  (unbiased, the direction they advocate for lower-variance discrete gradients).
+- **§5.3.1 estimator comparison** is validated against a **finite-difference**
+  gradient baseline; SPA/stochastic-derivative is the unbiased/low-bias reference
+  for SIR.
+
+**Consistency of our repo (`models/network_sir.py`, `models/surrogates.py`):**
+- We implement **two** of their three estimators — `gumbel_sigmoid` (their GS,
+  τ=0.5 default) and `straight_through_bernoulli` (their ST, `custom_jvp` passing
+  `p_dot`). We do **not** implement StochasticAD / stochastic-derivatives (§3.4.3);
+  that is Julia (`StochasticAD.jl`) in their work and has no JAX equivalent here.
+- Control flow matches §3.3: we use **sigmoid** relaxations (`k_sig=20` for the
+  lockdown `beta_eff`, `k_init=50` for infection seeding).
+- Our per-node `(S,I,R)` state is continuous-relaxed under Gumbel but collapses to
+  one-hot per node under ST, so with ST each node behaves as a discrete agent —
+  reasonably aligned with their per-agent §2.3 model; under Gumbel it is a relaxed
+  version. The smoothing sharpness (`k_sig`, `k_init`, `gumbel_tau`) is the
+  discrete→smooth bias knob and must be a controlled variable in EXP-008.
+- **Our novel angle, not theirs:** the `grad_horizon` truncation / gradient-variance
+  -over-length concern (RQ4, DEC-011) is absent from their SIR treatment — it is our
+  contribution, not something to reconcile against them.
+
 ## Relation to our project
 
 Quera-Bofarull et al. 2025 (2509.03303) is our project's **canonical diff-ABM reference**: it
