@@ -35,9 +35,9 @@ correct large-β regime): the old OPG is the gradient covariance, not the GGN.
   uncertainty 57×; a redundant one (prevalence) does not. The diagnostic is
   actionable (EXP-007).
 - **C14** supported conditionally — on discrete network-SIR the leading GGN
-  eigenspace is robust to the surrogate gradient (Gumbel↔straight-through ≤8.9° for
-  k≤3; Gumbel FD-validated 3.1e-5); eigenvalue *scale* is surrogate-dependent
-  (0.22–0.43×) (EXP-008).
+  eigenspace is robust to the surrogate gradient at **two** operating points
+  (Gumbel↔straight-through leading-2 angle 8.9° & 8.4°; Gumbel FD-validated
+  3.0e-5/3.4e-5); eigenvalue *scale* is surrogate-dependent (0.22–0.48×) (EXP-008).
 - **C15** supported conditionally — truncated differentiation destroys the local
   geometry: halving the horizon rotates the leading eigenspace ~80° and collapses
   its top eigenvalue to 15% of full (→1% at T/8) (EXP-008). Empirical counterpart to
@@ -59,7 +59,7 @@ correct large-β regime): the old OPG is the gradient covariance, not the GGN.
 | EXP-005 | Does the prior-relative GGN match the SIR posterior? | ✅ done — **yes** on smooth SIR: axes ~1°, profiles <0.5% (C10, C11) |
 | EXP-006 | Does a sloppy direction change a policy output? | ✅ done — **yes**: intervention value ~0→2180 cases within a good fit (C12) |
 | EXP-007 | Which added observation informs the weak direction? | ✅ done — compliance: λ 8.9e-6→10, policy uncertainty ↓57× (C13) |
-| EXP-008 | Is discrete-SIR GGN geometry robust to the surrogate, and does horizon truncation destroy it? | ✅ done — leading eigenspace robust Gumbel↔ST ≤8.9°; horizon truncation rotates it ~80° + collapses λ (C14, C15) |
+| EXP-008 | Is discrete-SIR GGN geometry robust to the surrogate, and does horizon truncation destroy it? | ✅ done — leading eigenspace robust Gumbel↔ST ~8.4–8.9° at **two** operating points; horizon truncation rotates it ~80° + collapses λ (C14, C15) |
 
 ## Scope limitations
 
@@ -91,9 +91,10 @@ is now demonstrated, not just asserted (C15). The MVP claim arc is **C01–C15**
 
 Candidates (scientific lead / gatekeeper to prioritize):
 - **First manuscript pass** — the evidence for the MVP arc is complete.
-- **EXP-008 depth** (optional): a second discrete-SIR operating point / graph, add
-  the SPA/StochasticAD estimator (deferred, DEC-011) to strengthen C14 beyond
-  Gumbel-vs-ST, or a cross-seed-estimator variance check.
+- **EXP-008 depth** (optional): C14/C15 now hold at two operating points (attack
+  29% & 52%, different graphs). Remaining depth = add the SPA/StochasticAD estimator
+  (deferred, DEC-011) to strengthen C14 beyond Gumbel-vs-ST with an unbiased third
+  estimator, or a cross-seed-estimator variance check.
 - **EXP-009 — computational scaling** (C16), if a scaling claim is wanted.
 
 ## Deferred (revive when reached)
