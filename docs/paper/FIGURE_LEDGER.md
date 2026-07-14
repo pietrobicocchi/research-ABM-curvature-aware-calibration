@@ -132,8 +132,8 @@ One 2D slice; a visual, not a global proof.
 ### Data source
 
 Script `experiments/fig02_ellipse.py`. Run
-`outputs/FIG-02/20260714T200951Z_1fcff7b/` (commit `1fcff7b`, **dirty=true** —
-clean-commit re-run pending). SIR contour panel: fresh 2D loss grid (121²) around
+`outputs/FIG-02/20260714T205637Z_4ee0e10/` (commit `4ee0e10`, **dirty=false**).
+SIR contour panel: fresh 2D loss grid (121²) around
 the EXP-005 smooth-SIR fit in the (γ, I₀) plane — the one cleanly readable plane
 (every other pair is dominated by the single ultra-stiff λ₁≈2.5×10⁴ direction).
 Affine panel: a fresh linear-Gaussian benchmark via `benchmarks.linear_gaussian`
@@ -155,7 +155,7 @@ are machine-zero and would vanish on a log bar axis.
 
 ### Status
 
-Candidate (pending a clean-commit authoritative re-run).
+Candidate.
 
 ## FIG-03 — Where it breaks
 
@@ -447,12 +447,12 @@ A single trajectory does not establish path-independence.
 ### Data source
 
 EXP-010 · `docs/experiments/EXP-010.md`. Run
-`outputs/EXP-010/20260714T195743Z_1fcff7b/` (commit `1fcff7b`, **dirty=true** — a
-clean-commit re-run is pending). Script `experiments/exp010_calibration_path.py`.
+`outputs/EXP-010/20260714T205630Z_4ee0e10/` (commit `4ee0e10`, **dirty=false**).
+Script `experiments/exp010_calibration_path.py`.
 
 ### Status
 
-Candidate (pending a clean-commit authoritative re-run).
+Candidate.
 
 ## FIG-10 — Robustness under stochasticity, discreteness, and surrogate gradients
 
