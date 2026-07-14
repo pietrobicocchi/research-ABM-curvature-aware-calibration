@@ -174,8 +174,11 @@ def _figure(summary, path):
         import matplotlib
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
+        from curvature_calib.viz import style as STY
     except Exception:
         return
+    STY.apply_style()
+    R = STY.ROLE
     ch = summary["checkpoints"]
     steps = np.array([c["step"] for c in ch])
     losses = np.array([c["loss"] for c in ch])
@@ -183,35 +186,49 @@ def _figure(summary, path):
     d_data = np.array([c["d_data"] for c in ch])
     angles = {k: np.array([c["angle_to_final_deg"][str(k)] for c in ch]) for k in KS}
 
-    fig, ax = plt.subplots(2, 2, figsize=(9, 6))
+    fig, ax = plt.subplots(2, 2, figsize=STY.figsize("double", 0.62))
 
-    ax[0, 0].semilogy(steps, np.maximum(losses, 1e-300), "o-", ms=3)
+    # (a) descent — single series (neutral truth ink)
+    ax[0, 0].semilogy(steps, np.maximum(losses, 1e-300), "-", color=R["truth"], lw=1.7)
     ax[0, 0].set_xlabel("iteration"); ax[0, 0].set_ylabel("profiled fit loss (nats)")
-    ax[0, 0].set_title("descent", fontsize=10)
+    ax[0, 0].set_title("descent")
+    STY.panel_label(ax[0, 0], "a")
 
+    # (b) spectrum — ordered stiff→sloppy family, sequential ramp
+    ecol = STY.seq_colors(eigs.shape[1])
     for j in range(eigs.shape[1]):
-        ax[0, 1].semilogy(steps, np.maximum(eigs[:, j], 1e-300), "-", lw=1.4,
-                          label=f"λ{j+1}")
-    ax[0, 1].axhline(1.0, ls=":", c="k")
-    ax[0, 1].set_xlabel("iteration"); ax[0, 1].set_ylabel("prior-relative λ")
-    ax[0, 1].set_title("spectrum settling", fontsize=10); ax[0, 1].legend(fontsize=7, ncol=2)
+        ax[0, 1].semilogy(steps, np.maximum(eigs[:, j], 1e-300), "-", lw=1.5,
+                          color=ecol[j], label=rf"$\lambda_{{{j+1}}}$")
+    ax[0, 1].axhline(1.0, ls=STY.LS["ref"], c=R["ref"], lw=1.2)
+    ax[0, 1].text(steps[-1], 1.0, r" $\lambda=1$", va="center", ha="left",
+                  fontsize=7, color=R["ref"])
+    ax[0, 1].set_xlabel("iteration"); ax[0, 1].set_ylabel(r"prior-relative $\lambda$")
+    ax[0, 1].set_title("spectrum settling"); ax[0, 1].legend(fontsize=7, ncol=2)
+    STY.panel_label(ax[0, 1], "b")
 
-    for k in KS:
-        ax[1, 0].plot(steps, angles[k], "o-", ms=3, label=f"leading-{k}")
-    ax[1, 0].axhline(10.0, ls=":", c="0.5"); ax[1, 0].axhline(5.0, ls=":", c="0.7")
+    # (c) eigenspace stability — ordered leading-k family, sequential ramp
+    kcol = STY.seq_colors(len(KS))
+    for c, k in zip(kcol, KS):
+        ax[1, 0].plot(steps, angles[k], "-", lw=1.7, color=c, label=f"leading-{k}")
+    for lvl in (10.0, 5.0):
+        ax[1, 0].axhline(lvl, ls=STY.LS["ref"], c=R["ref"], lw=1.0)
     ax[1, 0].set_xlabel("iteration"); ax[1, 0].set_ylabel("angle to final (deg)")
-    ax[1, 0].set_title("eigenspace stability along the path", fontsize=10)
-    ax[1, 0].legend(fontsize=7)
+    ax[1, 0].set_title("eigenspace stability along the path")
+    ax[1, 0].legend()
+    STY.panel_label(ax[1, 0], "c")
 
-    ax[1, 1].step(steps, d_data, where="post")
-    ax[1, 1].set_xlabel("iteration"); ax[1, 1].set_ylabel("data-dominant dim (λ>1)")
+    # (d) d_data — single series
+    ax[1, 1].step(steps, d_data, where="post", color=R["ggn"], lw=1.7)
+    ax[1, 1].set_xlabel("iteration"); ax[1, 1].set_ylabel(r"data-dominant dim ($\lambda>1$)")
     ax[1, 1].set_ylim(-0.2, eigs.shape[1] + 0.2)
-    ax[1, 1].set_title("d_data stabilizing", fontsize=10)
+    ax[1, 1].set_title("data-dominant dimension")
+    STY.panel_label(ax[1, 1], "d")
 
-    fig.suptitle("EXP-010 — calibration-path stability of the local geometry", fontsize=11)
-    fig.tight_layout()
+    fig.suptitle("The local geometry is stable along the whole calibration path",
+                 fontsize=12, fontweight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.96))
     for ext in ("png", "pdf"):
-        fig.savefig(f"{path}.{ext}", dpi=140, bbox_inches="tight")
+        fig.savefig(f"{path}.{ext}")
     plt.close(fig)
 
 

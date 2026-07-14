@@ -24,18 +24,24 @@ proposed · candidate · approved · superseded · rejected.
 
 ## Overview (belief order)
 
-| ID | Figure | Gate / job | Experiment(s) | Data status | Status |
+All ten are **rendered** in the manuscript house style (serif/LaTeX type, the
+`viz/style.py` `ROLE` semantic palette, mixed hero-double/single widths). Render
+scripts are `experiments/fig0N_*.py` (each loads a frozen run record) plus
+`fig02_ellipse.py` and `exp010_calibration_path.py`; outputs live in the gitignored
+`outputs/figures/`. Status is **candidate** pending gatekeeper approval.
+
+| ID | Figure | Gate / job | Experiment(s) | Render script | Status |
 |---|---|---|---|---|---|
-| FIG-01 | Concept schematic | Orient the whole idea | — | design only | proposed |
-| FIG-02 | The ellipse is the valley | 1 · correct & visible | smooth-SIR slice + affine | rendered | candidate |
-| FIG-03 | Where it breaks (H=G+R, validity radius) | 2 · honest scope | EXP-002 (+EXP-004) | exists | candidate |
-| FIG-04 | Real-ABM validation & horizon boundary (Brock–Hommes) | 2 · sound in a real ABM + scope limit | EXP-004/004b | exists | candidate |
-| FIG-05 | Posterior overlay (SIR) | 2→3 bridge · it is the real posterior | EXP-005 | exists | candidate |
-| FIG-06 | Reading the geometry (spectrum + participation) | 3 · how to use it | EXP-005/006 | exists; heatmap new render | candidate |
-| FIG-07 | The payoff — policy underdetermination | 4 · **the** figure | EXP-006 | exists | candidate |
-| FIG-08 | Observation design | 4 · actionable | EXP-007 | exists | candidate |
-| FIG-09 | Calibration-path stability | offline-snapshot contrast | EXP-010 | exists | candidate |
-| FIG-10 | Robustness (stochastic/discrete/surrogate) | 5 · survives messiness | EXP-008 | exists | candidate |
+| FIG-01 | Concept schematic | Orient the whole idea | — (illustration) | `fig01_schematic.py` | candidate |
+| FIG-02 | The ellipse is the valley | 1 · correct & visible | smooth-SIR slice + affine | `fig02_ellipse.py` | candidate |
+| FIG-03 | Where it breaks (H=G+R, validity radius) | 2 · honest scope | EXP-002 | `fig03_where_it_breaks.py` | candidate |
+| FIG-04 | Real-ABM validation & horizon boundary (Brock–Hommes) | 2 · sound in a real ABM + scope limit | EXP-004 | `fig04_brock_hommes.py` | candidate |
+| FIG-05 | Posterior overlay (SIR) | 2→3 bridge · it is the real posterior | EXP-005 | `fig05_posterior.py` | candidate |
+| FIG-06 | Reading the geometry (spectrum + participation) | 3 · how to use it | EXP-005 (recomputed) | `fig06_reading_geometry.py` | candidate |
+| FIG-07 | The payoff — policy underdetermination | 4 · **the** figure | EXP-006 | `fig07_payoff.py` | candidate |
+| FIG-08 | Observation design | 4 · actionable | EXP-007 | `fig08_obs_design.py` | candidate |
+| FIG-09 | Calibration-path stability | offline-snapshot contrast | EXP-010 | `exp010_calibration_path.py` | candidate |
+| FIG-10 | Robustness (stochastic/discrete/surrogate) | 5 · survives messiness | EXP-008 | `fig10_robustness.py` | candidate |
 
 **The two hero figures everything else serves: FIG-02 (the ellipse is the valley)
 and FIG-07 (the payoff).** If those two are not crisp, nothing else matters.

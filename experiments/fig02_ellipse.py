@@ -34,6 +34,8 @@ from experiments.exp005_sir_posterior import T, m, SIGMA_DATA, Z0, PARAM_NAMES  
 _COMMAND = "uv run python -m experiments.fig02_ellipse"
 
 PLANE = (1, 2)                     # (gamma, I0) — the cleanly-readable anisotropic plane
+LATEX = {"beta": r"\beta", "gamma": r"\gamma", "I0": r"I_0",
+         "t_lock": r"t_{\mathrm{lock}}", "f_lock": r"f_{\mathrm{lock}}"}
 LEVELS = [0.5, 2.0, 8.0]          # loss levels (nats) for both contours and ellipses
 GRID_N = 121
 
@@ -129,18 +131,21 @@ def _figure(sir, aff, path):
     import matplotlib.pyplot as plt
     STY.apply_style()
 
-    fig, ax = plt.subplots(1, 2, figsize=(9.6, 4.3), gridspec_kw={"width_ratios": [1.3, 1]})
+    from matplotlib.lines import Line2D
+    R = STY.ROLE
+    fig, ax = plt.subplots(1, 2, figsize=STY.figsize("double", 0.47),
+                           gridspec_kw={"width_ratios": [1.3, 1]})
     i, j = PLANE
     A, Bb = np.meshgrid(sir["a"], sir["b"])
 
-    # --- left: SIR loss slice + GGN ellipses at the same loss levels ---
-    ax[0].contour(A, Bb, sir["L"], levels=LEVELS, colors="#2c3e50",
+    # --- (a) SIR loss slice + GGN ellipses at the same loss levels ---
+    ax[0].contour(A, Bb, sir["L"], levels=LEVELS, colors=R["truth"],
                   linewidths=1.5, zorder=2)
-    ax[0].text(0.03, 0.97, "contours & ellipses at\nL = 0.5, 2, 8 nats",
-               transform=ax[0].transAxes, fontsize=7.5, color="#2c3e50",
+    ax[0].text(0.03, 0.97, "contours & ellipses at\n$L = 0.5,\\ 2,\\ 8$ nats",
+               transform=ax[0].transAxes, fontsize=7.5, color=R["truth"],
                ha="left", va="top")
     for c, E in sir["ellipses"].items():
-        ax[0].plot(E[0], E[1], ls="--", lw=1.7, color=STY.QUAL[1], zorder=3)
+        ax[0].plot(E[0], E[1], ls=STY.LS["ggn_quad"], lw=1.7, color=R["ggn"], zorder=3)
     # fixed-length eigenvector arrows (direction, not magnitude), labels at the tips
     wa, wb = sir["window"]
     L_arrow = 0.5 * min(wa, wb)
@@ -150,37 +155,38 @@ def _figure(sir, aff, path):
             d = -d                                              # point into the upper half
         tip = d * L_arrow
         ax[0].annotate("", xy=(tip[0], tip[1]), xytext=(0, 0),
-                       arrowprops=dict(arrowstyle="-|>", color=STY.QUAL[0], lw=1.8), zorder=5)
-        ax[0].text(tip[0] * 1.16, tip[1] * 1.16, lab, color=STY.QUAL[0], fontsize=9,
+                       arrowprops=dict(arrowstyle="-|>", color=R["ggn"], lw=1.8), zorder=5)
+        ax[0].text(tip[0] * 1.18, tip[1] * 1.18, lab, color=R["ggn"], fontsize=9,
                    fontweight="bold", ha="center", va="center", zorder=6)
-    ax[0].plot(0, 0, "o", color="k", ms=4, zorder=6)
-    from matplotlib.lines import Line2D
-    proxies = [Line2D([0], [0], color="#2c3e50", lw=1.5, label="true loss"),
-               Line2D([0], [0], color=STY.QUAL[1], lw=1.7, ls="--", label="GGN quadratic")]
-    ax[0].legend(handles=proxies, loc="lower right", fontsize=8, framealpha=0.9)
-    ax[0].set_xlabel(f"z[{PARAM_NAMES[i]}]  (prior-std)")
-    ax[0].set_ylabel(f"z[{PARAM_NAMES[j]}]  (prior-std)")
-    ax[0].set_title("GGN ellipse vs true loss  (γ, I₀ plane)")
+    ax[0].plot(0, 0, "o", color=R["truth"], ms=4, zorder=6)
+    proxies = [Line2D([0], [0], color=R["truth"], lw=1.5, label="true loss"),
+               Line2D([0], [0], color=R["ggn"], lw=1.7, ls="--", label="GGN quadratic")]
+    ax[0].legend(handles=proxies, loc="lower right")
+    ax[0].set_xlabel(rf"$z_{{{LATEX[PARAM_NAMES[i]]}}}$  (prior-std)")
+    ax[0].set_ylabel(rf"$z_{{{LATEX[PARAM_NAMES[j]]}}}$  (prior-std)")
+    ax[0].set_title(r"GGN ellipse vs true loss  ($\gamma,\ I_0$ plane)")
     ax[0].set_aspect("equal", adjustable="box")
+    STY.panel_label(ax[0], "a")
 
-    # --- right: affine exactness — AD tracks analytic; OPG collapses at the fit ---
+    # --- (b) affine exactness — AD tracks analytic; OPG collapses at the fit ---
     ea, ed = np.array(aff["eig_analytic"]), np.array(aff["eig_ad"])
     idx = np.arange(1, len(ea) + 1)
-    ax[1].plot(idx, ea, "o", ms=9, mfc="none", mec=STY.QUAL[0], mew=1.8,
-               label="analytic  AᵀWA", zorder=3)
-    ax[1].plot(idx, ed, "x", ms=7, color=STY.QUAL[1], mew=2.0,
-               label="AD (matches to ≤ε)", zorder=4)
+    ax[1].plot(idx, ea, "o", ms=9, mfc="none", mec=R["truth"], mew=1.8,
+               label=r"analytic  $A^\top W A$", zorder=3)
+    ax[1].plot(idx, ed, "x", ms=7, color=R["ggn"], mew=2.0,
+               label=r"AD (matches to $\leq\varepsilon$)", zorder=4)
     ax[1].set_yscale("log")
     ax[1].set_xlabel("eigenvalue index"); ax[1].set_ylabel("eigenvalue (log)")
     ax[1].set_xticks(idx)
     ax[1].set_title("affine benchmark: exact recovery")
-    ax[1].legend(loc="upper right", fontsize=8, framealpha=0.9)
-    ax[1].annotate("scalar-gradient OPG ≡ 0 at the fit\n(the GGN is not)",
+    ax[1].legend(loc="upper right")
+    ax[1].annotate("scalar-gradient OPG $\\equiv 0$ at the fit\n(the GGN is not)",
                    xy=(0.5, 0.04), xycoords="axes fraction", ha="center", va="bottom",
-                   fontsize=8, color=STY.QUAL[1],
-                   bbox=dict(boxstyle="round,pad=0.3", fc="white", ec=STY.QUAL[1], lw=1.0))
+                   fontsize=8, color=R["opg"],
+                   bbox=dict(boxstyle="round,pad=0.3", fc="white", ec=R["opg"], lw=1.0))
+    STY.panel_label(ax[1], "b")
 
-    fig.suptitle("The GGN is the local loss geometry", fontsize=12.5, fontweight="bold")
+    fig.suptitle("The GGN is the local loss geometry", fontsize=12, fontweight="bold")
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     for ext in ("png", "pdf"):
         fig.savefig(f"{path}.{ext}")
