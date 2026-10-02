@@ -42,7 +42,7 @@ def load_arrays(name: str) -> dict:
 def save_figure(fig, name: str) -> Path:
     FIGURES_DIR.mkdir(exist_ok=True)
     path = FIGURES_DIR / f"{name}.pdf"
-    fig.savefig(path)
+    fig.savefig(path, metadata={"CreationDate": None})
     return path
 
 

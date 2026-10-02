@@ -65,7 +65,7 @@ def load(name):
 
 def save_figure(fig, name):
     FIGURES_DIR.mkdir(exist_ok=True)
-    fig.savefig(FIGURES_DIR / f"{name}.pdf")
+    fig.savefig(FIGURES_DIR / f"{name}.pdf", metadata={"CreationDate": None})
 
 
 def to_list(x):
