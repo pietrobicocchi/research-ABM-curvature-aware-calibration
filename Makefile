@@ -12,7 +12,7 @@ EXPERIMENTS = \
 	netsir_estimator_comparison \
 	netsir_gradient_robustness
 
-ZIP_EXCLUDE = "*.git*" "*/.venv/*" ".venv/*" "*/__pycache__/*" "*.pyc" "*/.pytest_cache/*" "*.DS_Store" "outputs/*" "supplementary_code.zip"
+ZIP_EXCLUDE = "*.git*" ".venv/*" "*/.venv/*" "__pycache__/*" "*/__pycache__/*" "*.pyc" ".pytest_cache/*" "*/.pytest_cache/*" "*.DS_Store" "outputs/*" "supplementary_code.zip"
 
 .PHONY: figures compute all check test zip clean
 
