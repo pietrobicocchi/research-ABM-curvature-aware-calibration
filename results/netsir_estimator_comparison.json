@@ -1,0 +1,89 @@
+{
+ "results": {
+  "windows": [
+   {
+    "T": 8,
+    "attack_rate": 0.11890278007471812,
+    "eigvals_plugin": [
+     0.172300461063314,
+     0.0028921302186434112,
+     7.76301451517511e-05
+    ],
+    "eigvals_cross_seed": [
+     0.1612000588161575,
+     0.0026997584149346253,
+     3.658071412680536e-05
+    ],
+    "sloppiest_angle_deg": 0.28032154411238797,
+    "plugin_bias_fraction_of_lambda_min": 0.5287820980458362
+   },
+   {
+    "T": 90,
+    "attack_rate": 0.8584092031972049,
+    "eigvals_plugin": [
+     0.2585952852828616,
+     0.009681373787062495,
+     0.0008704300555053958
+    ],
+    "eigvals_cross_seed": [
+     0.2478092065227937,
+     0.009357904393543488,
+     0.0007705396987872211
+    ],
+    "sloppiest_angle_deg": 0.06985309129910366,
+    "plugin_bias_fraction_of_lambda_min": 0.11475977430509977
+   }
+  ]
+ },
+ "config": {
+  "model": {
+   "population": 150,
+   "dt": 1.0,
+   "kappa": 20.0,
+   "kappa_init": 50.0,
+   "gumbel_tau": 0.5,
+   "prior_sd": {
+    "beta": 0.3,
+    "gamma": 0.3,
+    "I0": 0.3,
+    "t_lock": 0.5,
+    "f_lock": 0.6
+   },
+   "random_features": 128,
+   "seeds": 128,
+   "base_seed": 20250714,
+   "operating_points": {
+    "A": {
+     "beta": 0.03,
+     "gamma": 0.06,
+     "I0": 0.03,
+     "t_lock": 0.2,
+     "f_lock": 0.3,
+     "mean_degree": 6,
+     "graph_seed": 17,
+     "horizon": 40
+    },
+    "B": {
+     "beta": 0.045,
+     "gamma": 0.1,
+     "I0": 0.03,
+     "t_lock": 0.15,
+     "f_lock": 0.25,
+     "mean_degree": 8,
+     "graph_seed": 29,
+     "horizon": 40
+    }
+   }
+  },
+  "windows": [
+   8,
+   90
+  ]
+ },
+ "environment": {
+  "python": "3.12.14",
+  "jax": "0.4.30",
+  "numpy": "2.4.6",
+  "float64": true
+ }
+}

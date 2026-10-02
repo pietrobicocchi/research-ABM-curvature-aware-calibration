@@ -1,64 +1,8 @@
-# Memory (Claude session notes, per-machine, not for repo)
-docs/memory/
-
-# Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.egg-info/
 .pytest_cache/
-.ruff_cache/
-.mypy_cache/
-
-# Virtual env / uv
 .venv/
 venv/
-.python-version
-
-# Build/dist
-build/
-dist/
-*.egg
-
-# Editors / OS
-.vscode/
-.idea/
 .DS_Store
-
-# Brainstorming companion (local mockups)
-.superpowers/
-
-# Notebooks
-.ipynb_checkpoints/
-
-# Experiment outputs
-runs/
 outputs/
-wandb/
-mlruns/
-*.npz
-*.npy
-checkpoints/
-
-# LaTeX build artefacts
-docs/paper/*.aux
-docs/paper/*.log
-docs/paper/*.out
-docs/paper/*.bbl
-docs/paper/*.blg
-docs/paper/*.fls
-docs/paper/*.fdb_latexmk
-docs/paper/*.synctex.gz
-paper/*.aux
-paper/*.log
-paper/*.out
-paper/*.bbl
-paper/*.blg
-paper/*.fls
-paper/*.fdb_latexmk
-paper/*.synctex.gz
-paper/main.pdf
-paper/sections/*.aux
-paper/diagrams/*.pdf
-paper/diagrams/*.aux
-paper/diagrams/*.log
+supplementary_code.zip

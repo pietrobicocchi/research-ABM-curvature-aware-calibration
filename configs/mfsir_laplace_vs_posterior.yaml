@@ -1,0 +1,7 @@
+# Fig. 2, App. C.1: Laplace posterior from G against importance sampling.
+model: mfsir_model
+is_draws: 400000
+is_inflation: 1.3           # proposal covariance = inflation x Laplace covariance
+is_key: 1
+# displacements along the stiffest and sloppiest eigenvectors, in posterior s.d.
+alphas: [-3.0, -2.0, -1.0, -0.5, -0.25, 0.25, 0.5, 1.0, 2.0, 3.0]

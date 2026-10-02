@@ -1,0 +1,9 @@
+# Fig. 1: the diagnostic along an Adam calibration path.
+model: mfsir_model
+start_offset: 1.0           # z_init = z_hat + 1 in every coordinate
+learning_rate: 0.05
+adam_betas: [0.9, 0.999]
+adam_eps: 1.0e-8
+steps: 800
+checkpoint_every: 8
+leading_k: [1, 2, 3]

@@ -1,0 +1,7 @@
+# Fig. 8, App. D: surrogate gradients and the differentiation horizon.
+model: netsir_model
+operating_points: [A, B]
+surrogates: [gumbel, straight_through]
+horizon_fractions: [1.0, 0.5, 0.25, 0.125]   # differentiation horizon / T
+fd_step: 0.01
+leading_k: 2                # subspace compared across differentiation horizons

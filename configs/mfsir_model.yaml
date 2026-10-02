@@ -1,0 +1,16 @@
+# Mean-field SIR (Table 1, App. B.1). Shared by every mfsir_* experiment.
+population: 100000          # N
+horizon: 200                # T, steps of dt
+dt: 1.0
+kappa: 20.0                 # sharpness of the lockdown gate
+theta_star:                 # reference parameters (z = 0)
+  beta: 0.4
+  gamma: 0.1
+  I0: 0.001
+  t_lock: 0.4               # fraction of the horizon (day 80)
+  f_lock: 0.5
+prior_log_sd: 0.30          # beta, gamma
+prior_logit_sd: 0.50        # I0, t_lock, f_lock
+sigma_obs: 150.0            # observation noise; W = sigma^-2 I
+temperature: 1.0            # w
+simulation_key: 0

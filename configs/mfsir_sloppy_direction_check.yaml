@@ -1,0 +1,8 @@
+# Fig. 6: summaries not used in calibration, along the stiffest and sloppiest directions.
+model: mfsir_model
+replicates: 256             # noisy replicates of the trajectory per draw
+noise_draws: 8
+noise_key_offset: 1000      # draw s uses key noise_key_offset + s
+alphas: [-1.5, 1.5, 17]     # [start, stop, num], prior s.d.
+acf_max_lag: 30
+quantiles: [1, 5, 95, 99]

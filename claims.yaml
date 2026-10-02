@@ -1,0 +1,428 @@
+# Empirical claims of the paper, one entry per claim; checked by scripts/check_claims.py.
+#
+# location   section/caption and line of the submission source
+# values     as printed in the paper, in the printed units:
+#              "7.4"    must equal the code value rounded to the printed precision
+#                       (decimals as printed; integers without their trailing zeros,
+#                       "2.5e4" to the printed mantissa)
+#              "<0.2"   strict bound on the unrounded code value
+#              "<=0.5"  "within" bound on the code value at the printed precision
+#              true     a qualitative statement; the check returns whether it holds
+# experiment the experiment the claim belongs to
+# code       the file (and function) that produce the value
+# note       how a value is defined, and known differences from the text
+
+# ------------------------------------------------------------------ Fig. 1
+- id: path_d_data_first_iterate
+  location: "Sec. 3.3, l. 496"
+  sentence: "the number of data-dominant directions is already correct at the first iterate"
+  values: {holds: true}
+  experiment: mfsir_calibration_path
+  code: {file: experiments/mfsir_calibration_path.py, function: compute}
+
+- id: path_angle_at_start
+  location: "Sec. 3.3, l. 497"
+  sentence: "the leading eigenspace lies 7.4 deg from its final orientation at the start"
+  values: {angle_deg: "7.4"}
+  experiment: mfsir_calibration_path
+  code: {file: experiments/mfsir_calibration_path.py, function: compute}
+  note: "Leading eigenspace = leading-2 subspace (leading-1: 3.1 deg, leading-3: 0.02 deg)."
+
+- id: path_within_1deg_loss_ratio
+  location: "Sec. 3.3, l. 498-499"
+  sentence: "within 1 deg while the loss is still 926 times its final value"
+  values: {angle_deg: "<=1", loss_over_final: "926"}
+  experiment: mfsir_calibration_path
+  code: {file: experiments/mfsir_calibration_path.py, function: compute}
+  note: >
+    Read at the first checkpoint after the start (step 8): angle 1.02 deg, loss ratio
+    925.6. The code's own threshold is 5 deg. The angle rises again to 9.9 deg at
+    step 24 and first stays below 1 deg at step 368 (loss 1.47x final).
+
+- id: path_start_displacement
+  location: "Fig. 1 caption, l. 507"
+  sentence: "from a start displaced by one prior standard deviation in each coordinate"
+  values: {z_init: "1"}
+  experiment: mfsir_calibration_path
+  code: {file: configs/mfsir_calibration_path.yaml}
+
+- id: path_caption_panel_c
+  location: "Fig. 1 caption, l. 509"
+  sentence: "(c) Angle between each of the three leading eigenvectors and its orientation at the fit"
+  values: {caption: true}
+  experiment: mfsir_calibration_path
+  code: {file: experiments/mfsir_calibration_path.py, function: plot}
+  note: "The panel shows the largest principal angle of the leading-k subspaces, k = 1, 2, 3."
+
+# ------------------------------------------------------------------ Fig. 2, App. C.1
+- id: laplace_spectrum
+  location: "Sec. 4, l. 621-622"
+  sentence: "The prior-relative spectrum is lambda = (2.5e4, 135, 2.78, 5.3e-3, 8.9e-6)"
+  values: {lambda_1: "2.5e4", lambda_2: "135", lambda_3: "2.78", lambda_4: "5.3e-3", lambda_5: "8.9e-6"}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: compute}
+
+- id: laplace_d_data
+  location: "Sec. 4, l. 622-623"
+  sentence: "three of the five directions are data-dominant, as in the sampled posterior"
+  values: {d_data_G: "3", d_data_sampled: "3"}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: compute}
+  note: "d_data_sampled: number of eigenvectors of G along which the sampled posterior s.d. is below 1/sqrt(2) (precision above 2, i.e. lambda > 1); computed by check_claims from the saved arrays."
+
+- id: laplace_axis_angles
+  location: "Sec. 4, l. 623-624"
+  sentence: "The two leading axes agree to 0.68 deg and 1.0 deg"
+  values: {axis1_deg: "0.68", axis2_deg: "1.0"}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: compute}
+  note: "Eigenvectors of the two posterior covariances, i.e. the two broadest axes; the second value is the leading-2 subspace angle."
+
+- id: laplace_profile_error
+  location: "Sec. 4, l. 624-626"
+  sentence: "the profiled posterior energy ... matches the predicted 1/2 alpha^2 (lambda_k + 1) to within 0.5%"
+  values: {max_rel_error_pct: "<=0.5"}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: compute}
+
+- id: laplace_differences_only_sloppy
+  location: "Sec. 4, l. 626-628"
+  sentence: "The only visible differences are in the two prior-dominated directions"
+  values: {holds: true}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: compute}
+  note: "Checked as: the largest marginal SD error is on t_lock or f_lock."
+
+- id: laplace_caption_panel_b
+  location: "Fig. 2 caption, l. 650-651"
+  sentence: "(b) Profiled posterior energy along the stiffest and sloppiest eigenvectors, with the prediction"
+  values: {caption: true}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: plot}
+  note: "The panel shows the relative error of the prediction, not the energy."
+
+- id: is_settings
+  location: "App. C.1, l. 1117-1118"
+  sentence: "we draw 4e5 points from ... the Laplace Gaussian with its covariance inflated by a factor of 1.3"
+  values: {n_draws: "4e5", inflation: "1.3"}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: configs/mfsir_laplace_vs_posterior.yaml}
+
+- id: is_ess
+  location: "App. C.1, l. 1120"
+  sentence: "The effective sample size is about 7,400"
+  values: {ess: "7400"}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: compute}
+
+- id: laplace_reference_tight_directions
+  location: "App. C.1, l. 1125-1127"
+  sentence: "The reference is tight in exactly the three directions with lambda > 1 and diffuse in the other two"
+  values: {holds: true}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: compute}
+  note: "Computed in check_claims from the saved G and Sig_ref (same definition as d_data_sampled)."
+
+- id: laplace_cov_frobenius
+  location: "App. C.1, l. 1128-1129"
+  sentence: "the covariance differs by 25% in Frobenius norm"
+  values: {rel_frobenius_pct: "25"}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: compute}
+
+- id: laplace_tlock_marginal
+  location: "App. C.1, l. 1129"
+  sentence: "and the t_lock marginal by 20%"
+  values: {rel_error_pct: "20"}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: experiments/mfsir_laplace_vs_posterior.py, function: compute}
+
+# ------------------------------------------------------------------ Fig. 3, App. C.2
+- id: hessian_leading_angle
+  location: "Sec. 4, l. 631-632"
+  sentence: "the leading principal angle is 0.00 deg to two decimal places"
+  values: {angle_deg: "0.00"}
+  experiment: mfsir_ggn_vs_fd_hessian
+  code: {file: experiments/mfsir_ggn_vs_fd_hessian.py, function: compute}
+  note: "Largest of the leading-1, -2, -3 subspace angles."
+
+- id: hessian_max_eig_error
+  location: "Sec. 4, l. 632-633"
+  sentence: "the largest per-eigenvalue error is 0.28%"
+  values: {max_rel_error_pct: "0.28"}
+  experiment: mfsir_ggn_vs_fd_hessian
+  code: {file: experiments/mfsir_ggn_vs_fd_hessian.py, function: compute}
+
+- id: hessian_cost
+  location: "Sec. 4, l. 633-635"
+  sentence: "Forming G takes P = 5 forward-mode JVPs ...; the central-difference Hessian takes 2P^2 + 1 = 51 solves"
+  values: {G_jvps: "5", fd_evals: "51"}
+  experiment: mfsir_ggn_vs_fd_hessian
+  code: {file: experiments/mfsir_ggn_vs_fd_hessian.py, function: compute}
+
+- id: hessian_fd_step
+  location: "App. C.2, l. 1137"
+  sentence: "with step h = 5e-4"
+  values: {h: "5e-4"}
+  experiment: mfsir_ggn_vs_fd_hessian
+  code: {file: experiments/mfsir_ggn_vs_fd_hessian.py, function: compute}
+  note: "h is selected by step-halving among {1e-2, 5e-3, 2.5e-3, 1e-3, 5e-4}, not fixed."
+
+- id: hessian_disagreement_sloppiest
+  location: "App. C.2, l. 1138-1140"
+  sentence: "What little disagreement remains sits on the sloppiest direction"
+  values: {holds: true}
+  experiment: mfsir_ggn_vs_fd_hessian
+  code: {file: experiments/mfsir_ggn_vs_fd_hessian.py, function: compute}
+
+# ------------------------------------------------------------------ Fig. 4
+- id: reading_stiff_sloppy_parameters
+  location: "Sec. 4, l. 638-641"
+  sentence: "the three stiff directions are carried almost entirely by beta, gamma, and I0, while the two sloppy directions are ... t_lock and ... f_lock"
+  values: {holds: true}
+  experiment: mfsir_spectrum_loadings
+  code: {file: experiments/mfsir_spectrum_loadings.py, function: compute}
+  note: "Checked as: |loading| of v1-v3 on (beta, gamma, I0) above 0.99; v4 on t_lock and v5 on f_lock above 0.95."
+
+# ------------------------------------------------------------------ Fig. 5, Sec. 5
+- id: counterfactual_range
+  location: "Sec. 5, l. 702-703"
+  sentence: "the number of averted infections ranges from 2 to 1276, against a fitted value of 90"
+  values: {Q_lo: "2", Q_hi: "1276", Q_fit: "90"}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+
+- id: counterfactual_observed_unchanged
+  location: "Sec. 5, l. 701-702"
+  sentence: "Across this admissible set the observed epidemic changes very little"
+  values: {holds: true}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+  note: "Computed in check_claims from the saved profile: largest |change in observed total cases| over the in-budget points, required below 1% (it is 0.58%)."
+
+- id: counterfactual_budget
+  location: "Sec. 5, l. 699"
+  sentence: "retain the settings within 2 nats"
+  values: {budget_nats: "2"}
+  experiment: mfsir_counterfactual
+  code: {file: configs/mfsir_counterfactual.yaml}
+
+- id: reference_peak_day
+  location: "Sec. 5, l. 707"
+  sentence: "The epidemic peaks near day 24"
+  values: {peak_day: "24"}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+  note: "Day index of the largest incidence at theta*."
+
+- id: reference_lockdown_day
+  location: "Sec. 5, l. 708"
+  sentence: "the lockdown begins around day 80"
+  values: {lockdown_day: "80"}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+
+- id: reference_infected_by_lockdown
+  location: "Sec. 5, l. 708-709"
+  sentence: "by which time about 98% of the population has been infected"
+  values: {infected_pct: "98"}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+  note: "(I0 + cumulative incidence before day 80) / N."
+
+- id: flock_cumulative_incidence
+  location: "Sec. 5, l. 710-711"
+  sentence: "Varying f_lock across nearly its entire range changes cumulative incidence by less than 0.2%"
+  values: {range_pct: "<0.2"}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+  note: "f_lock in [0.01, 0.99]; spread (max - min) of total incidence relative to the fit."
+
+- id: compliance_design_settings
+  location: "Sec. 5, l. 728-729"
+  sentence: "beta(t) on days 60-139 ... with noise standard deviation 0.02"
+  values: {first_day: "60", last_day: "139", noise_sd: "0.02"}
+  experiment: mfsir_counterfactual
+  code: {file: configs/mfsir_counterfactual.yaml}
+
+- id: compliance_smallest_eigenvalue
+  location: "Sec. 5, l. 729-730"
+  sentence: "raises the smallest eigenvalue from 8.9e-6 to about 10"
+  values: {before: "8.9e-6", after: "10"}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+
+- id: compliance_d_data
+  location: "Sec. 5, l. 730-731"
+  sentence: "and the number of data-dominant directions from three to five"
+  values: {before: "3", after: "5"}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+
+- id: compliance_range_narrowing
+  location: "Sec. 5, l. 731-732"
+  sentence: "it narrows the admissible range of Q from 1274 to 72 cases, a factor of 17.8"
+  values: {width_incidence: "1274", width_compliance: "72", factor: "17.8"}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+
+- id: prevalence_design_settings
+  location: "Sec. 5, l. 733-734"
+  sentence: "prevalence ... observed with noise of 10% of its peak"
+  values: {noise_pct_of_peak: "10"}
+  experiment: mfsir_counterfactual
+  code: {file: configs/mfsir_counterfactual.yaml}
+
+- id: prevalence_spectrum_barely_changes
+  location: "Sec. 5, l. 735-736"
+  sentence: "it barely changes the spectrum"
+  values: {holds: true}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+  note: "Checked as: every eigenvalue changes by less than a factor of 2. lambda_3 changes from 2.78 to 59.4."
+
+- id: prevalence_range_narrowing
+  location: "Sec. 5, l. 736"
+  sentence: "narrows the range of Q by a factor of only 1.03"
+  values: {factor: "1.03"}
+  experiment: mfsir_counterfactual
+  code: {file: experiments/mfsir_counterfactual.py, function: compute}
+
+# ------------------------------------------------------------------ Fig. 6
+- id: sloppy_check_ratios
+  location: "Sec. 5, l. 749-750"
+  sentence: "The stiff perturbation changes them 977, 3868, and 2430 times more, respectively, than the sloppy one"
+  values: {moments: "977", acf: "3868", tail_quantiles: "2430"}
+  experiment: mfsir_sloppy_direction_check
+  code: {file: experiments/mfsir_sloppy_direction_check.py, function: compute}
+  note: "Ratios at the largest displacement, alpha = +1.5."
+
+- id: sloppy_check_unchanged
+  location: "Sec. 5, l. 750-751"
+  sentence: "the sloppy one ... leaves all three essentially unchanged"
+  values: {holds: true}
+  experiment: mfsir_sloppy_direction_check
+  code: {file: experiments/mfsir_sloppy_direction_check.py, function: compute}
+  note: "Checked as: the largest sloppy discrepancy is below 1% of the largest stiff one, for each summary."
+
+- id: sloppy_check_settings
+  location: "Fig. 6 caption, l. 774-777"
+  sentence: "256 noisy replicates ... sigma = 150 cases ... the mean over 8 independent noise draws"
+  values: {replicates: "256", sigma: "150", noise_draws: "8"}
+  experiment: mfsir_sloppy_direction_check
+  code: {file: configs/mfsir_sloppy_direction_check.yaml}
+
+# ------------------------------------------------------------------ Fig. 7, Sec. 6
+- id: window_early_reading
+  location: "Sec. 6, l. 821-824"
+  sentence: "When the window covers about 12% of the final epidemic size, I0 loads mainly on the stiffer directions, and the sloppiest direction is dominated by the recovery rate gamma"
+  values: {final_size_pct: "12", holds: true}
+  experiment: netsir_observation_window
+  code: {file: experiments/netsir_observation_window.py, function: compute}
+  note: "12% is the attack rate at T = 8; the fraction of the final size observed is 14%."
+
+- id: window_i0_loading_rise
+  location: "Sec. 6, l. 830-831"
+  sentence: "the loading of I0 on the sloppiest eigenvector rises from 0.29 to 0.70"
+  values: {first_window: "0.29", last_window: "0.70"}
+  experiment: netsir_observation_window
+  code: {file: experiments/netsir_observation_window.py, function: compute}
+  note: "0.700 at T = 40, 0.717 at T = 60, 0.692 at T = 90 (last window)."
+
+- id: window_late_reading
+  location: "Sec. 6, l. 831-832"
+  sentence: "by the end of the epidemic (attack rate about 86%) the sloppiest direction is a coupled I0-gamma combination"
+  values: {attack_pct: "86", holds: true}
+  experiment: netsir_observation_window
+  code: {file: experiments/netsir_observation_window.py, function: compute}
+
+- id: window_caption_fractions
+  location: "Fig. 7 caption, l. 848-849"
+  sentence: "(b) ... when about 12% of the final size is observed. (c) The same at about 86%."
+  values: {panel_b_final_size_pct: "12", panel_c_final_size_pct: "86"}
+  experiment: netsir_observation_window
+  code: {file: experiments/netsir_observation_window.py, function: compute}
+  note: "Panels b and c are at T = 8 and T = 90, where 14% and 100% of the final size is observed (12% and 86% are attack rates)."
+
+- id: window_settings
+  location: "Table 1, l. 1218"
+  sentence: "point A, f_lock = 1; T in {6, 8, 10, 12, 16, 20, 28, 40, 60, 90}"
+  values: {n_windows: "10", first_T: "6", last_T: "90"}
+  experiment: netsir_observation_window
+  code: {file: configs/netsir_observation_window.yaml}
+
+- id: estimator_sloppiest_agreement
+  location: "Sec. 6, l. 836-837"
+  sentence: "at both windows the sloppiest eigenvectors of G_V and G_U agree to within 0.3 deg"
+  values: {max_angle_deg: "<=0.3"}
+  experiment: netsir_estimator_comparison
+  code: {file: experiments/netsir_estimator_comparison.py, function: compute}
+  note: "G_U on the same per-seed Jacobians as G_V; windows T = 8 and T = 90."
+
+- id: estimator_plugin_bias_fraction
+  location: "Sec. 6, l. 838; Discussion l. 886-888"
+  sentence: "the plug-in bias accounts for 11-53% of the smallest eigenvalue"
+  values: {min_pct: "11", max_pct: "53"}
+  experiment: netsir_estimator_comparison
+  code: {file: experiments/netsir_estimator_comparison.py, function: compute}
+  note: "(lambda_min(G_V) - lambda_min(G_U)) / lambda_min(G_V) at T = 8 and T = 90."
+
+# ------------------------------------------------------------------ Fig. 8, App. D
+- id: robustness_surrogate_angles
+  location: "App. D, l. 1151-1153"
+  sentence: "The leading one- to three-dimensional eigenspaces from the two constructions agree to within about 6-11 deg"
+  values: {min_deg: "6", max_deg: "11"}
+  experiment: netsir_gradient_robustness
+  code: {file: experiments/netsir_gradient_robustness.py, function: compute}
+
+- id: robustness_gumbel_fd
+  location: "App. D, l. 1154-1156"
+  sentence: "The Gumbel-sigmoid Jacobians agree with central finite differences of the relaxed simulator"
+  values: {holds: true}
+  experiment: netsir_gradient_robustness
+  code: {file: experiments/netsir_gradient_robustness.py, function: compute}
+  note: "Checked as: median relative error below 1e-3 at both points."
+
+- id: robustness_st_fd_error
+  location: "App. D, l. 1156-1158"
+  sentence: "The straight-through Jacobians differ from central finite differences ... by about 100% in median relative error"
+  values: {point_A_pct: "100", point_B_pct: "100"}
+  experiment: netsir_gradient_robustness
+  code: {file: experiments/netsir_gradient_robustness.py, function: compute}
+
+- id: robustness_eigenvalue_scale
+  location: "App. D, l. 1158-1161"
+  sentence: "the eigenvalue scale differs accordingly, yet the leading eigenspaces still agree"
+  values: {holds: true}
+  experiment: netsir_gradient_robustness
+  code: {file: experiments/netsir_gradient_robustness.py, function: compute}
+  note: "Checked as: lambda_1 differs by more than 20% between the constructions while all leading-k angles stay below 15 deg."
+
+- id: robustness_truncation_rotation
+  location: "App. D, l. 1166-1168"
+  sentence: "When the differentiation window is halved ... the leading eigenspace rotates by about 80 deg"
+  values: {point_A_deg: "80", point_B_deg: "80"}
+  experiment: netsir_gradient_robustness
+  code: {file: experiments/netsir_gradient_robustness.py, function: compute}
+
+# ------------------------------------------------------------------ Table 1
+- id: table1_mfsir
+  location: "Table 1"
+  sentence: "Mean-field SIR: N = 1e5, T = 200, theta* = (0.4, 0.1, 1e-3, 0.4, 0.5), sigma = 150, w = 1"
+  values: {N: "1e5", T: "200", beta: "0.4", gamma: "0.1", I0: "1e-3", t_lock: "0.4", f_lock: "0.5", sigma: "150", w: "1"}
+  experiment: mfsir_laplace_vs_posterior
+  code: {file: configs/mfsir_model.yaml}
+
+- id: table1_netsir
+  location: "Table 1"
+  sentence: "Network SIR: N = 150; mean degree 6 (A), 8 (B); graph seed 17 (A), 29 (B); T = 40; D = 128; M = 128; tau = 0.5; kappa = 20; kappa_init = 50; prior widths 0.30, 0.30, 0.30, 0.50, 0.60"
+  values: {N: "150", degree_A: "6", degree_B: "8", seed_A: "17", seed_B: "29", T: "40", D: "128", M: "128", tau: "0.5", kappa: "20", kappa_init: "50", prior_beta: "0.30", prior_gamma: "0.30", prior_I0: "0.30", prior_t_lock: "0.50", prior_f_lock: "0.60"}
+  experiment: netsir_gradient_robustness
+  code: {file: configs/netsir_model.yaml}
+
+- id: table1_netsir_reference
+  location: "Table 1"
+  sentence: "A: (0.03, 0.06, 0.03, 0.20, 0.30); B: (0.045, 0.10, 0.03, 0.15, 0.25)"
+  values: {A_beta: "0.03", A_gamma: "0.06", A_I0: "0.03", A_t_lock: "0.20", A_f_lock: "0.30", B_beta: "0.045", B_gamma: "0.10", B_I0: "0.03", B_t_lock: "0.15", B_f_lock: "0.25"}
+  experiment: netsir_gradient_robustness
+  code: {file: configs/netsir_model.yaml}

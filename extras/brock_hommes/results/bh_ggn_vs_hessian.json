@@ -1,0 +1,112 @@
+{
+ "complex": {
+  "theta": [
+   50.0,
+   0.9,
+   0.2,
+   0.9,
+   -0.2
+  ],
+  "horizon_sweep": [
+   {
+    "horizon": 1,
+    "lead_eigval": 8.386342725714852e-05,
+    "lead_angle_to_full_deg": 6.588556805646878
+   },
+   {
+    "horizon": 5,
+    "lead_eigval": 0.010420869501359547,
+    "lead_angle_to_full_deg": 3.3769050123523687
+   },
+   {
+    "horizon": 10,
+    "lead_eigval": 0.017794920921970048,
+    "lead_angle_to_full_deg": 2.133201000668671
+   },
+   {
+    "horizon": 20,
+    "lead_eigval": 0.04570525598780954,
+    "lead_angle_to_full_deg": 3.4293049062306804
+   },
+   {
+    "horizon": 50,
+    "lead_eigval": 0.14743938293098138,
+    "lead_angle_to_full_deg": 1.2621837531312958
+   },
+   {
+    "horizon": null,
+    "lead_eigval": 0.376824409227113,
+    "lead_angle_to_full_deg": 1.7075472925031877e-06
+   }
+  ],
+  "off_fit": [
+   {
+    "delta": 0.0,
+    "residual_over_hessian": 4.93784909364835e-16
+   },
+   {
+    "delta": 0.3,
+    "residual_over_hessian": 0.511796993528135
+   },
+   {
+    "delta": 0.8,
+    "residual_over_hessian": 1.2301770853555436
+   }
+  ]
+ },
+ "chaotic": {
+  "theta": [
+   80.0,
+   0.9,
+   0.2,
+   0.9,
+   -0.2
+  ],
+  "horizon_sweep": [
+   {
+    "horizon": 1,
+    "lead_eigval": 1.4792627422243781e-05,
+    "lead_angle_to_full_deg": 45.91067690831009
+   },
+   {
+    "horizon": 5,
+    "lead_eigval": 0.004698281688787581,
+    "lead_angle_to_full_deg": 35.71363428980002
+   },
+   {
+    "horizon": 10,
+    "lead_eigval": 0.039477880390561854,
+    "lead_angle_to_full_deg": 47.99045986183505
+   },
+   {
+    "horizon": 20,
+    "lead_eigval": 0.2936353104627343,
+    "lead_angle_to_full_deg": 31.163461482384026
+   },
+   {
+    "horizon": 50,
+    "lead_eigval": 152904.24057289696,
+    "lead_angle_to_full_deg": 9.59959528040432
+   },
+   {
+    "horizon": null,
+    "lead_eigval": 153302003.52975494,
+    "lead_angle_to_full_deg": 1.2074182697257331e-06
+   }
+  ],
+  "off_fit": [
+   {
+    "delta": 0.0,
+    "residual_over_hessian": 2.105187268138378e-15
+   },
+   {
+    "delta": 0.3,
+    "residual_over_hessian": 0.995358461922457
+   },
+   {
+    "delta": 0.8,
+    "residual_over_hessian": 0.9977942527599774
+   }
+  ]
+ }
+}

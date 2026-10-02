@@ -1,0 +1,26 @@
+# Fig. 5, Sec. 5: the lockdown counterfactual and the candidate observations.
+model: mfsir_model
+budget_nats: 2.0            # admissible set: profiled posterior energy within the budget
+compliance:                 # direct measurement of beta(t)
+  first_day: 60
+  end_day: 140              # exclusive: days 60-139
+  noise_sd: 0.02
+prevalence_noise_fraction: 0.10   # noise s.d. as a fraction of peak prevalence
+profile:
+  q_grid:                   # targets for Q, as [start, stop, num] segments
+    - [0.0, 200.0, 41]
+    - [210.0, 1000.0, 24]
+    - [1050.0, 2200.0, 16]
+  stop_factor: 3.0          # walk each profile until it exceeds stop_factor x budget
+  penalty_rhos: [1.0e+2, 1.0e+4, 1.0e+6]
+  q_cap: 2.0e+5
+  scale_cases: 1000.0
+region:
+  n_angles: 40
+  mu_cap: 1.0e+8
+  n_bisect: 11
+optimizer:                  # scipy L-BFGS-B
+  maxiter: 800
+  ftol: 1.0e-15
+  gtol: 1.0e-12
+f_lock_sweep: [0.01, 0.99, 99]    # [start, stop, num] for the cumulative-incidence check

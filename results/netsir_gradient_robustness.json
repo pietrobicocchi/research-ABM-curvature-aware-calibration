@@ -1,0 +1,193 @@
+{
+ "results": {
+  "operating_points": {
+   "A": {
+    "attack_rate": 0.2852104571832524,
+    "per_surrogate": {
+     "gumbel": {
+      "eigvals": [
+       0.3884219459818268,
+       0.05457213401176416,
+       0.012242088372496684,
+       0.0005835841267878812,
+       0.00039521307713519526
+      ],
+      "fd_rel_jacobian_error": [
+       5.029008292524537e-05,
+       7.825936658421044e-06,
+       3.823531504792064e-06,
+       4.2682320277902895e-05,
+       3.047620631430575e-05
+      ],
+      "fd_rel_jacobian_error_median": 3.047620631430575e-05
+     },
+     "straight_through": {
+      "eigvals": [
+       0.1667849739377913,
+       0.012280022214589265,
+       0.0034593640885634577,
+       0.00023370571530348218,
+       0.00012769932673964863
+      ],
+      "fd_rel_jacobian_error": [
+       1.1984748183658134,
+       0.9919200206998425,
+       1.2471392858551527,
+       1.2413677127938116,
+       1.0966351586823553
+      ],
+      "fd_rel_jacobian_error_median": 1.1984748183658134
+     }
+    },
+    "surrogate_angle_deg_by_k": {
+     "1": 8.608724129283742,
+     "2": 8.91309593946457,
+     "3": 5.908285925241309
+    },
+    "horizon_truncation": [
+     {
+      "grad_horizon": 40,
+      "angle_to_full_deg": 0.0
+     },
+     {
+      "grad_horizon": 20,
+      "angle_to_full_deg": 80.27878711213265
+     },
+     {
+      "grad_horizon": 10,
+      "angle_to_full_deg": 81.64120980166106
+     },
+     {
+      "grad_horizon": 5,
+      "angle_to_full_deg": 81.65424690438832
+     }
+    ]
+   },
+   "B": {
+    "attack_rate": 0.5225291902371868,
+    "per_surrogate": {
+     "gumbel": {
+      "eigvals": [
+       0.792351889757106,
+       0.11495853199185428,
+       0.022149726511522888,
+       0.0019586454034605794,
+       0.000868433819808304
+      ],
+      "fd_rel_jacobian_error": [
+       7.15443250794124e-05,
+       1.0744335029430775e-05,
+       4.584939400305857e-06,
+       4.988663171645845e-05,
+       3.355455847609871e-05
+      ],
+      "fd_rel_jacobian_error_median": 3.355455847609871e-05
+     },
+     "straight_through": {
+      "eigvals": [
+       0.37854549919513314,
+       0.029604382939544423,
+       0.005747760087297492,
+       0.0004822121339280641,
+       0.00036855138171361325
+      ],
+      "fd_rel_jacobian_error": [
+       0.823024316088694,
+       0.8746182399020542,
+       0.8960580876881915,
+       0.8838982988757075,
+       0.9124120543555586
+      ],
+      "fd_rel_jacobian_error_median": 0.8838982988757075
+     }
+    },
+    "surrogate_angle_deg_by_k": {
+     "1": 8.282978772345146,
+     "2": 8.388810069388693,
+     "3": 11.050399166634408
+    },
+    "horizon_truncation": [
+     {
+      "grad_horizon": 40,
+      "angle_to_full_deg": 1.4787793334710982e-06
+     },
+     {
+      "grad_horizon": 20,
+      "angle_to_full_deg": 80.77917631419443
+     },
+     {
+      "grad_horizon": 10,
+      "angle_to_full_deg": 81.32225253300123
+     },
+     {
+      "grad_horizon": 5,
+      "angle_to_full_deg": 81.3269783872651
+     }
+    ]
+   }
+  }
+ },
+ "config": {
+  "model": {
+   "population": 150,
+   "dt": 1.0,
+   "kappa": 20.0,
+   "kappa_init": 50.0,
+   "gumbel_tau": 0.5,
+   "prior_sd": {
+    "beta": 0.3,
+    "gamma": 0.3,
+    "I0": 0.3,
+    "t_lock": 0.5,
+    "f_lock": 0.6
+   },
+   "random_features": 128,
+   "seeds": 128,
+   "base_seed": 20250714,
+   "operating_points": {
+    "A": {
+     "beta": 0.03,
+     "gamma": 0.06,
+     "I0": 0.03,
+     "t_lock": 0.2,
+     "f_lock": 0.3,
+     "mean_degree": 6,
+     "graph_seed": 17,
+     "horizon": 40
+    },
+    "B": {
+     "beta": 0.045,
+     "gamma": 0.1,
+     "I0": 0.03,
+     "t_lock": 0.15,
+     "f_lock": 0.25,
+     "mean_degree": 8,
+     "graph_seed": 29,
+     "horizon": 40
+    }
+   }
+  },
+  "operating_points": [
+   "A",
+   "B"
+  ],
+  "surrogates": [
+   "gumbel",
+   "straight_through"
+  ],
+  "horizon_fractions": [
+   1.0,
+   0.5,
+   0.25,
+   0.125
+  ],
+  "fd_step": 0.01,
+  "leading_k": 2
+ },
+ "environment": {
+  "python": "3.12.14",
+  "jax": "0.4.30",
+  "numpy": "2.4.6",
+  "float64": true
+ }
+}

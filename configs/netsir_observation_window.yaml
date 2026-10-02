@@ -1,0 +1,6 @@
+# Fig. 7, Sec. 6: geometry as the observation window lengthens.
+model: netsir_model
+operating_point: A
+f_lock: 1.0                 # lockdown off; P = 3 (beta, gamma, I0)
+windows: [6, 8, 10, 12, 16, 20, 28, 40, 60, 90]
+panel_windows: [8, 90]      # panels (b) and (c)

@@ -1,0 +1,6 @@
+# Fig. 3, App. C.2: G against a central finite-difference Hessian.
+model: mfsir_model
+# candidate steps; each is compared with half its size and the finer step of the
+# most self-consistent pair is used
+fd_steps: [2.0e-2, 1.0e-2, 5.0e-3, 2.0e-3, 1.0e-3]
+leading_k: [1, 2, 3]
