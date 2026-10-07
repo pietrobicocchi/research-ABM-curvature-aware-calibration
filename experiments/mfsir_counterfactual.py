@@ -87,9 +87,8 @@ class Counterfactual:
         by continuation in q outward from the fitted value; the upward walk continues
         past the grid until the energy exceeds stop_dU."""
         p = self.cfg["profile"]
-        embed = lambda x: jnp.zeros(5).at[jnp.arange(5)].set(jnp.asarray(x))
         vg = jax.jit(jax.value_and_grad(
-            lambda x, q, rho: U(embed(x)) + 0.5 * rho * ((self.Q(embed(x)) - q) / self.scale) ** 2))
+            lambda x, q, rho: U(x) + 0.5 * rho * ((self.Q(x) - q) / self.scale) ** 2))
         rows = []
         q0 = float(self.Q(jnp.zeros(5)))
         for direction in ("up", "down"):

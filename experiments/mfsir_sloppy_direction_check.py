@@ -66,10 +66,10 @@ def compute():
     alphas = np.linspace(*cfg["alphas"])
     directions = {"stiffest": V[:, 0], "sloppiest": V[:, -1]}
 
+    mean_fit = np.asarray(sir.incidence(z_hat))
     curves = {}
     for d, v in directions.items():
         out = {k: np.zeros((cfg["noise_draws"], len(alphas))) for k in SUMMARIES}
-        mean_fit = np.asarray(sir.incidence(z_hat + 0.0 * jnp.asarray(v)))
         means = [np.asarray(sir.incidence(z_hat + a * jnp.asarray(v))) for a in alphas]
         for s in range(cfg["noise_draws"]):
             noise = np.asarray(jax.random.normal(

@@ -117,7 +117,7 @@ def plot():
     ax[0].set_ylim(0, 20)
     plotting.panel_label(ax[0], "a")
 
-    scol = {"gumbel": R["ggn"], "straight_through": R["opg"]}
+    scol = {"gumbel": R["ggn"], "straight_through": R["contrast"]}
     x2 = np.arange(len(pts))
     for s, sur in enumerate(scol):
         ax[1].bar(x2 + (s - 0.5) * w,

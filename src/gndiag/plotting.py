@@ -15,7 +15,7 @@ DIV = "RdBu_r"
 ROLE = {
     "truth":    "#2c3e50",  # reference: exact Hessian, sampled posterior, full horizon
     "ggn":      "#1f3a93",  # the Gauss-Newton matrix
-    "opg":      "#c0392b",
+    "contrast": "#c0392b",  # second method in a two-way comparison
     "residual": "#e67e22",
     "alt":      "#8e44ad",  # second categorical member (e.g. point B)
     "ref":      "#7f8c8d",  # reference lines and guides
